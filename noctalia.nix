@@ -12,8 +12,6 @@
     nautilus
     adw-gtk3
     nwg-look
-    btop
-    tmux
 
     # Noctalia Screen Toolkit requirements.
     slurp
@@ -50,29 +48,11 @@
     withUWSM = true;
   };
 
-  # Use Noctalia's generated palette for both Qt 5 and Qt 6 applications.
+  # Use Noctalia's generated palette for Qt 5 and Qt 6 apps (see home/desktop.nix).
   # The NixOS qt5ct platform theme installs both qt5ct and qt6ct plugins.
   qt = {
     enable = true;
     platformTheme = "qt5ct";
-  };
-
-  environment.etc = {
-    "xdg/qt5ct/qt5ct.conf".text = ''
-      [Appearance]
-      color_scheme_path=/home/pedrocoutinho/.config/qt5ct/colors/noctalia.conf
-      custom_palette=true
-      standard_dialogs=default
-      style=Fusion
-    '';
-
-    "xdg/qt6ct/qt6ct.conf".text = ''
-      [Appearance]
-      color_scheme_path=/home/pedrocoutinho/.config/qt6ct/colors/noctalia.conf
-      custom_palette=true
-      standard_dialogs=default
-      style=Fusion
-    '';
   };
 
   services.tuned.enable = true;

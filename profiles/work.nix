@@ -63,19 +63,22 @@ in
     libraries = [ pkgs.icu ];
   };
 
-  programs.zsh.interactiveShellInit = ''
-    eval "$(${pkgs.mise}/bin/mise activate zsh)"
-  '';
-  programs.starship.settings = {
-    format = lib.mkForce "$directory$git_branch$git_status$mise$cmd_duration$line_break$character";
-    mise.symbol = "mise ";
+  # Work-only additions to home/ (merged into the base Home Manager config).
+  home-manager.users.pedrocoutinho = {
+    programs.mise.enable = true;
+    programs.starship.settings = {
+      format = lib.mkForce "$directory$git_branch$git_status$mise$cmd_duration$line_break$character";
+      mise.symbol = "mise ";
+    };
+    home.packages = with pkgs; [
+      lazygit
+      gh
+    ];
   };
 
   # Work-only packages and settings belong here.
   environment.systemPackages = with pkgs; [
     slack
-    lazygit
-    gh
     lazydocker
     docker-compose
     docker-buildx
@@ -85,7 +88,6 @@ in
     claudeDesktop
     opencode
     opencode-desktop
-    mise
     tuios
   ];
 }

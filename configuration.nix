@@ -114,78 +114,23 @@ in
     packages = with pkgs; [ ];
   };
 
+  # zsh must be enabled system-wide to be a login shell. Its interactive
+  # config (history, plugins, prompt) lives in home/shell.nix.
   programs.zsh = {
     enable = true;
-    enableCompletion = true;
-    autosuggestions.enable = true;
-    syntaxHighlighting.enable = true;
-
-    # Keep a large, shared history database outside the home-directory root.
-    histSize = 50000;
-    histFile = "$HOME/.local/state/zsh/history";
-    setOptions = [
-      "EXTENDED_HISTORY"
-      "HIST_EXPIRE_DUPS_FIRST"
-      "HIST_FCNTL_LOCK"
-      "HIST_IGNORE_ALL_DUPS"
-      "HIST_IGNORE_DUPS"
-      "HIST_REDUCE_BLANKS"
-      "SHARE_HISTORY"
-    ];
-
-    interactiveShellInit = ''
-      mkdir -p "$HOME/.local/state/zsh"
-    '';
+    # Home Manager runs compinit; doing it here too slows every shell start.
+    enableCompletion = false;
   };
+  # Expose completions shipped by system packages to Home Manager's compinit.
+  environment.pathsToLink = [ "/share/zsh" ];
 
-  programs.starship = {
-    enable = true;
-    enableZshIntegration = true;
-    settings = {
-      add_newline = false;
-      command_timeout = 1000;
-      scan_timeout = 30;
-      format = "$directory$git_branch$git_status$cmd_duration$line_break$character";
-      right_format = "$status$time";
-
-      character = {
-        success_symbol = "[❯](bold green)";
-        error_symbol = "[❯](bold red)";
-      };
-      directory = {
-        truncation_length = 3;
-        truncate_to_repo = true;
-      };
-      git_branch.symbol = "git ";
-      git_status = {
-        ahead = "⇡\${count}";
-        behind = "⇣\${count}";
-        diverged = "⇕⇡\${ahead_count}⇣\${behind_count}";
-      };
-      cmd_duration.min_time = 1000;
-      status.disabled = false;
-      time = {
-        disabled = false;
-        format = "[$time](dimmed)";
-        time_format = "%H:%M";
-      };
-    };
-  };
-
-  programs.atuin = {
-    enable = true;
-    enableZshIntegration = true;
-    daemon.enable = true;
-    settings.search_mode = "fuzzy";
-  };
-
-  programs.zoxide = {
-    enable = true;
-    enableZshIntegration = true;
-    flags = [
-      "--cmd"
-      "cd"
-    ];
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    # Move pre-existing dotfiles aside instead of failing activation.
+    backupFileExtension = "hm-backup";
+    extraSpecialArgs = { inherit inputs; };
+    users.pedrocoutinho.imports = [ ./home ];
   };
 
   # These inherit this entire base system and become named boot-menu entries.

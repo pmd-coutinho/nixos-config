@@ -3,6 +3,10 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     claude-desktop = {
       url = "github:poeck/claude-desktop-nix-flake";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -43,6 +47,7 @@
           ./configuration.nix
           ./noctalia.nix
           inputs.chaotic.nixosModules.default
+          inputs.home-manager.nixosModules.home-manager
         ];
       };
     in
