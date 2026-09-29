@@ -10,13 +10,60 @@
     -- Niri-style overview: workspaces stacked in one zoomed-out column.
     hl.plugin.load("${pkgs.hyprlandPlugins.hyprtasking}/lib/libhyprtasking.so")
 
-    hl.bind("SUPER + O", function() hl.plugin.hyprtasking.toggle("all") end)
-    -- Escape closes the overview when it's open, and passes through otherwise.
-    hl.bind("escape", function()
-      if hl.plugin.hyprtasking.is_active() then
-        hl.plugin.hyprtasking.toggle("all")
+    local function ht()
+      return hl.plugin.hyprtasking
+    end
+
+    -- While the overview is open, the "overview" submap hands the arrows,
+    -- Enter, and Escape to it; the rest of the time they reach apps as usual.
+    -- The timer below keeps the submap in sync however the overview opens or
+    -- closes (keys, right-click, touchpad gesture).
+    local function sync_submap()
+      local plugin = ht()
+      if plugin == nil then
+        return
       end
-    end, { non_consuming = true })
+      local active = plugin.is_active()
+      local in_submap = hl.get_current_submap() == "overview"
+      if active and not in_submap then
+        hl.dispatch(hl.dsp.submap("overview"))
+      elseif not active and in_submap then
+        hl.dispatch(hl.dsp.submap("reset"))
+      end
+    end
+
+    local function toggle()
+      ht().toggle("all")
+      sync_submap()
+    end
+
+    -- Close-only, so a stale submap can never reopen the overview.
+    local function close()
+      if ht().is_active() then
+        ht().toggle("all")
+      end
+      sync_submap()
+    end
+
+    hl.bind("SUPER + O", toggle)
+
+    hl.define_submap("overview", function()
+      for _, dir in ipairs({ "up", "down", "left", "right" }) do
+        hl.bind(dir, function()
+          if ht().is_active() then
+            ht().move(dir)
+          else
+            sync_submap()
+          end
+        end)
+      end
+      -- Enter/Escape close onto the workspace you navigated to.
+      hl.bind("return", close)
+      hl.bind("escape", close)
+      hl.bind("SUPER + O", toggle)
+    end)
+
+    hl.timer(sync_submap, { timeout = 150, type = "repeat" })
 
     hl.config({
       plugin = {
@@ -25,8 +72,9 @@
           gap_size = 20,
           bg_color = 0xff141318, -- Noctalia base colour
           border_size = 2,
-          -- Closing the overview lands on the workspace under the cursor.
-          exit_on_hovered = true,
+          -- Closing lands on the active (keyboard-selected) workspace;
+          -- right-click still jumps to the one under the cursor.
+          exit_on_hovered = false,
           warp_on_move_window = 1,
           drag_button = 0x110, -- left click: drag windows between workspaces
           select_button = 0x111, -- right click: jump to that workspace
