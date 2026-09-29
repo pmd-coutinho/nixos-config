@@ -16,11 +16,9 @@ let
   );
 in
 {
-  imports = [ ./common.nix ];
-
   # Chaotic Nyx provides this upstream-parity CachyOS kernel and its cache.
-  boot.kernelPackages = lib.mkForce pkgs.linuxPackages_cachyos;
-  hardware.nvidia.package = lib.mkForce pkgs.nvidia_cachyos;
+  boot.kernelPackages = pkgs.linuxPackages_cachyos;
+  hardware.nvidia.package = pkgs.nvidia_cachyos;
 
   programs.steam = {
     enable = true;

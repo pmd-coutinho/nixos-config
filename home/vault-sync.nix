@@ -1,6 +1,6 @@
 # KeePassXC vault synced to Google Drive, plus the SSH agent KeePassXC loads
-# keys into. Imported by profiles/keepassxc-sync.nix (gaming and work only),
-# which keeps the system-side keyring and PAM settings.
+# keys into. Imported by modules/keepassxc-sync.nix, which keeps the
+# system-side keyring and PAM settings.
 { pkgs, ... }:
 
 let

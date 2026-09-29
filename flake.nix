@@ -43,12 +43,7 @@
       mkSystem = nixpkgs.lib.nixosSystem {
         inherit system;
         specialArgs = { inherit inputs; };
-        modules = [
-          ./configuration.nix
-          ./noctalia.nix
-          inputs.chaotic.nixosModules.default
-          inputs.home-manager.nixosModules.home-manager
-        ];
+        modules = [ ./configuration.nix ];
       };
     in
     {

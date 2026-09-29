@@ -26,13 +26,10 @@ let
 in
 
 {
-  imports = [
-    ./common.nix
-    inputs.chatgpt-desktop.nixosModules.default
-  ];
+  imports = [ inputs.chatgpt-desktop.nixosModules.default ];
 
-  boot.kernelPackages = lib.mkForce pkgs.linuxPackages_zen;
-  hardware.nvidia.package = lib.mkForce config.boot.kernelPackages.nvidiaPackages.latest;
+  boot.kernelPackages = pkgs.linuxPackages_zen;
+  hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.latest;
 
   # Rootful Docker daemon; access to its socket is limited to the work entry.
   virtualisation.docker = {
@@ -87,10 +84,12 @@ in
     docker-buildx
     jetbrains.rider
     dotnet-sdk_10
+    codex
     claude-code
     claudeDesktop
     opencode
     opencode-desktop
     tuios
+    azure-cli
   ];
 }
