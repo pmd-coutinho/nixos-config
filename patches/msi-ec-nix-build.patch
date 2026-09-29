@@ -1,0 +1,30 @@
+diff --git a/Makefile b/Makefile
+index 2291307..4a92331 100644
+--- a/Makefile
++++ b/Makefile
+@@ -3,7 +3,8 @@ include $(_SRC)/Makefile.vars # AKMOD can be annoying so preventing his silent context change
+ 
+ DKMS_ROOT_PATH  := /usr/src/msi_ec-$(VERSION)
+ 
+-KERNELRELEASE := $(shell uname -r)
++KERNELRELEASE ?= $(shell uname -r)
++KERNELDIR ?= /lib/modules/$(KERNELRELEASE)/build
+ 
+ KMOD_DIR        := /lib/modules/$(KERNELRELEASE)/updates/drivers/platform/x86
+ 
+@@ -13,10 +14,13 @@ all: modules
+ 
+ modules:
+-	@$(MAKE) -C /lib/modules/$(KERNELRELEASE)/build M=$(CURDIR) modules
++	@$(MAKE) -C $(KERNELDIR) M=$(CURDIR) modules
+ 
+ clean:
+-	@$(MAKE) -C /lib/modules/$(KERNELRELEASE)/build M=$(CURDIR) clean
++	@$(MAKE) -C $(KERNELDIR) M=$(CURDIR) clean
+ 
++modules_install:
++	@$(MAKE) -C $(KERNELDIR) M=$(CURDIR) modules_install
++
+ load:
+ 	insmod msi-ec.ko
+ 
