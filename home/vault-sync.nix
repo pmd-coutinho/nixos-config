@@ -86,7 +86,9 @@ in
   systemd.user.timers.rclone-vault-sync = {
     Unit.Description = "Periodic KeePassXC vault sync to Google Drive";
     Timer = {
-      OnBootSec = "2min";
+      # Relative to the timer starting (login, or a restart by a switch), so
+      # OnUnitActiveSec always has a first run to chain from.
+      OnActiveSec = "2min";
       OnUnitActiveSec = "5min";
       Persistent = true;
     };
