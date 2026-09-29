@@ -60,6 +60,13 @@
     settings.search_mode = "fuzzy";
   };
 
+  # Per-project environments: `echo "use flake" > .envrc && direnv allow`.
+  # nix-direnv caches the shell so re-entering a project is instant.
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
+  };
+
   programs.zoxide = {
     enable = true;
     options = [
