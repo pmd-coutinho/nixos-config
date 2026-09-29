@@ -11,6 +11,28 @@ nh os switch                          # after editing the config: build, activat
 nh os switch -u -a --commit-lock-file # weekly-ish: update inputs, review diff, confirm, commit flake.lock
 ```
 
+**`nh os switch`: your changes, same versions.** Builds from the versions
+pinned in `flake.lock`, so only your edit changes. Use it after adding or
+removing a package, changing a setting or service, or tweaking a
+specialisation. If something breaks, it was your edit.
+
+**`nh os switch -u ...`: same config, new versions.** Updates every input
+(nixpkgs unstable, chaotic, noctalia, helium, ...) to the latest upstream
+version and commits `flake.lock`. Use it for new app versions, kernel/NVIDIA
+updates, and security fixes. If something breaks, it came from upstream.
+
+## Rules of thumb
+
+- **Don't mix edits and updates.** Switch the edit first, confirm it works,
+  then update separately. Mixed, you can't tell who broke what.
+- **Update when you have time to fix things**, not right before a meeting.
+  nixos-unstable breaks occasionally.
+- **Update one thing** with `-U`, e.g. `nh os switch -U noctalia`.
+- **Kernel or NVIDIA driver changed?** Use `nh os boot -u --commit-lock-file`
+  and reboot, instead of switching in place (new userspace next to old kernel
+  modules).
+- **Add `-a`** to updates to see the package diff before confirming.
+
 ## Other commands
 
 | Command                  | What it does                                                        |
