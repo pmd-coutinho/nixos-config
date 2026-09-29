@@ -68,7 +68,10 @@ in
     programs.mise.enable = true;
     programs.starship.settings = {
       format = lib.mkForce "$directory$git_branch$git_status$mise$cmd_duration$line_break$character";
-      mise.symbol = "mise ";
+      mise = {
+        disabled = false;
+        symbol = "mise ";
+      };
     };
     home.packages = with pkgs; [
       lazygit
