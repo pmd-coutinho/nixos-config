@@ -189,12 +189,15 @@ in
   };
 
   # These inherit this entire base system and become named boot-menu entries.
+  # /etc/specialisation lets `nh os switch` stay in the currently booted entry.
   specialisation = {
     gaming.configuration = {
       imports = [ ./profiles/gaming.nix ];
+      environment.etc."specialisation".text = "gaming";
     };
     work.configuration = {
       imports = [ ./profiles/work.nix ];
+      environment.etc."specialisation".text = "work";
     };
   };
 
