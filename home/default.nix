@@ -9,6 +9,7 @@
     ./shell.nix
     ./git.nix
     ./desktop.nix
+    ./hyprland.nix
   ];
 
   programs.neovim = {
