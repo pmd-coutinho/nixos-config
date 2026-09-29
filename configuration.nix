@@ -164,7 +164,6 @@ in
     git
     codex
     firefox
-    ghostty
     blueman
     pwvucontrol
     vscode
