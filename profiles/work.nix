@@ -19,10 +19,7 @@ let
             old.postFixup;
       });
 
-  tuios = inputs.tuios.packages.${pkgs.stdenv.hostPlatform.system}.tuios.overrideAttrs (_: {
-    # Upstream v0.8.0 currently carries the previous Go dependency hash.
-    vendorHash = "sha256-mgVS2X9j+2qepgNNlCQLyBHnjrYWpJtJyqIfTq/nYcU=";
-  });
+  tuios = inputs.tuios.packages.${pkgs.stdenv.hostPlatform.system}.tuios;
 in
 
 {
