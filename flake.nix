@@ -35,6 +35,10 @@
       url = "github:BeardOverflow/msi-ec";
       flake = false;
     };
+    msi-mux = {
+      url = "github:hayatboj/msi-gpu-mux-switch/v0.5.0";
+      flake = false;
+    };
   };
   outputs =
     inputs@{ nixpkgs, ... }:

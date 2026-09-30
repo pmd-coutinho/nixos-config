@@ -272,6 +272,23 @@
         "type": "github"
       }
     },
+    "msi-mux": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1788792148,
+        "narHash": "sha256-9phtTv2MKd2MqUcvhvGgpqQWqmw+FjgCRFmDHfogO9M=",
+        "owner": "hayatboj",
+        "repo": "msi-gpu-mux-switch",
+        "rev": "e0a1e4bdeb14398b3be3722a1a91f9d1b6aa4403",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hayatboj",
+        "ref": "v0.5.0",
+        "repo": "msi-gpu-mux-switch",
+        "type": "github"
+      }
+    },
     "nix-fast-build": {
       "inputs": {
         "flake-parts": [
@@ -375,6 +392,7 @@
         "home-manager": "home-manager_2",
         "hyprmod": "hyprmod",
         "msi-ec": "msi-ec",
+        "msi-mux": "msi-mux",
         "nixpkgs": "nixpkgs_2",
         "noctalia": "noctalia",
         "tuios": "tuios"

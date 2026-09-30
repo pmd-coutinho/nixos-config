@@ -23,6 +23,7 @@ in
     ../hardware-configuration.nix
     ../noctalia.nix
     ./keepassxc-sync.nix
+    ./msi-mux.nix
     # Also needed in work: it configures the Chaotic Nyx binary cache, so
     # building the gaming entry from work downloads its kernel instead of
     # compiling it.
