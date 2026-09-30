@@ -59,6 +59,7 @@ in
 
   # Work-only additions to home/ (merged into the base Home Manager config).
   home-manager.users.pedrocoutinho = {
+    imports = [ ../home/zed.nix ];
     programs.mise.enable = true;
     programs.starship.settings = {
       format = lib.mkForce "$directory$git_branch$git_status$mise$cmd_duration$line_break$character";
