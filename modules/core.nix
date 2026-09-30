@@ -159,6 +159,8 @@ in
     bibata-cursors
     ayugram-desktop
     nodejs
+    (python3.withPackages (ps: [ ps.pip ]))
+    uv
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
