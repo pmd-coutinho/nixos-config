@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, pkgs, ... }:
 
 let
   # Noctalia generates the colour schemes; these files only point Qt at them.
@@ -6,11 +6,15 @@ let
     [Appearance]
     color_scheme_path=${config.xdg.configHome}/${dir}/colors/noctalia.conf
     custom_palette=true
+    icon_theme=Papirus-Dark
     standard_dialogs=default
     style=Fusion
   '';
 in
 {
+  # Without an icon theme Qt only finds bare hicolor, so standard icons go blank.
+  home.packages = [ pkgs.papirus-icon-theme ];
+
   xdg.configFile = {
     "qt5ct/qt5ct.conf".text = qtctConf "qt5ct";
     "qt6ct/qt6ct.conf".text = qtctConf "qt6ct";
