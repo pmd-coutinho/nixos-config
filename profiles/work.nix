@@ -39,6 +39,26 @@ in
   # use it as a backend, so install NetworkManager's OpenVPN plugin separately
   # for VPN profiles managed through nmcli or a desktop network applet.
   programs.openvpn3.enable = true;
+  # Build fixes for the openvpn3 stack; drop once nixpkgs catches up.
+  # - gdbuspp builds with -Werror and trips a GCC 15 maybe-uninitialized
+  #   false positive.
+  # - openvpn3 pins C++17, but abseil 20260817 (via protobuf) needs C++20;
+  #   its core then hits C++20 deprecation warnings under werror.
+  nixpkgs.overlays = [
+    (final: prev: {
+      gdbuspp = prev.gdbuspp.overrideAttrs (old: {
+        env = (old.env or { }) // {
+          NIX_CFLAGS_COMPILE = "${old.env.NIX_CFLAGS_COMPILE or ""} -Wno-error=maybe-uninitialized";
+        };
+      });
+      openvpn3 = prev.openvpn3.overrideAttrs (old: {
+        mesonFlags = old.mesonFlags ++ [
+          (lib.mesonOption "cpp_std" "c++20")
+          (lib.mesonBool "werror" false)
+        ];
+      });
+    })
+  ];
   networking.networkmanager.plugins = [ pkgs.networkmanager-openvpn ];
   # Let both clients install split-DNS routes for internal work domains without
   # racing to rewrite /etc/resolv.conf.
