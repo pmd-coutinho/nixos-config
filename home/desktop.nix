@@ -12,8 +12,17 @@ let
   '';
 in
 {
-  # Without an icon theme Qt only finds bare hicolor, so standard icons go blank.
-  home.packages = [ pkgs.papirus-icon-theme ];
+  # Without an icon theme apps only find bare hicolor, so standard icons go
+  # blank. Qt reads the theme from qtct (below); GTK and Noctalia read the
+  # GNOME icon-theme key. Adwaita stays installed for GTK's symbolic fallbacks.
+  home.packages = [
+    pkgs.papirus-icon-theme
+    pkgs.adwaita-icon-theme
+  ];
+  # Noctalia's tray flattens anything under a status/ directory into a
+  # monochrome silhouette, which blanks full-colour hicolor tray icons such
+  # as blueman's; Papirus ships proper panel/ variants for them.
+  dconf.settings."org/gnome/desktop/interface".icon-theme = "Papirus-Dark";
 
   xdg.configFile = {
     "qt5ct/qt5ct.conf".text = qtctConf "qt5ct";
