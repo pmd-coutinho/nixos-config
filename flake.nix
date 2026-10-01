@@ -31,6 +31,10 @@
       url = "github:BlueManCZ/hyprmod";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    opencode = {
+      url = "github:anomalyco/opencode/v2";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     msi-ec = {
       url = "github:BeardOverflow/msi-ec";
       flake = false;
