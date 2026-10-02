@@ -105,5 +105,9 @@ in
     enableGitIntegration = true;
   };
 
-  home.packages = [ pkgs.difftastic ];
+  home.packages = [
+    pkgs.difftastic
+    # Secret scanner used by this repo's .githooks/pre-commit.
+    pkgs.gitleaks
+  ];
 }

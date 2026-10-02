@@ -1,2 +1,18 @@
 result
 result-*
+.direnv/
+
+# Secrets that must never be committed. .githooks/pre-commit also blocks
+# these by name, in case one is force-added.
+*.ovpn
+rclone.conf
+*.kdbx
+*.pem
+*.key
+*.p12
+*.pfx
+.env
+.env.*
+id_rsa
+id_ecdsa
+id_ed25519
