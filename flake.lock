@@ -28,11 +28,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790896533,
-        "narHash": "sha256-H3O9JSxAKGEK9hSADvcyuc9ZAlyxpDMwqz0kHqWQE90=",
+        "lastModified": 1790930168,
+        "narHash": "sha256-NAn3AY1qIQH7CEjxd7bpVdJmdPbALlhyuSRXUVBflyc=",
         "owner": "danielbodart",
         "repo": "chatgpt-desktop",
-        "rev": "671597703d31c91d4ee62d04eb8a7afa58bf098d",
+        "rev": "c500dc1f568bc1958f4c420db1695854f229e31b",
         "type": "github"
       },
       "original": {
@@ -470,11 +470,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1790929200,
-        "narHash": "sha256-jC1WUrmPxe6ZMj4/hxAyl/VR4IPo95DMB4K+H2DH5Cs=",
+        "lastModified": 1790930093,
+        "narHash": "sha256-lARuIcubchggwojEBbVpxeROYcKlUg2muBtHAq6IIB4=",
         "owner": "Gaurav-Gosain",
         "repo": "tuios",
-        "rev": "70dbbc8f077f538148e36a0911c2c913e2178d5e",
+        "rev": "4fc31436d75aa78d57b08c8e2290786d557018d7",
         "type": "github"
       },
       "original": {
