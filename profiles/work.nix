@@ -158,6 +158,8 @@ in
     claudeDesktop
     opencode
     opencodeDesktop
+    pi-coding-agent
+    omp
     tuios
     azure-cli
   ];
