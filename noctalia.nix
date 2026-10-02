@@ -10,6 +10,9 @@
     inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default
     inputs.hyprmod.packages.${pkgs.stdenv.hostPlatform.system}.default
     nautilus
+    file-roller # archive manager; Nautilus "Open With" and "Compress…"
+    _7zz-rar # 7-Zip with RAR support; File Roller's backend for 7z
+    unar # File Roller's backend for RAR, including encrypted headers
     adw-gtk3
     nwg-look
 
