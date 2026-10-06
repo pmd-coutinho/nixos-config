@@ -13,6 +13,10 @@
 #   activates Server Security. The installer carries the PROTECT enrolment
 #   and subscription tokens, so it is never committed or copied into the store.
 #
+# Enabled with services.eset.enable. `sudo eset off` / `sudo eset on` stop
+# and start the whole suite without a rebuild; `eset status` shows it, and
+# eset-tray.py puts the same switch in the system tray.
+#
 # ESET's binaries are left byte-identical and run through nix-ld; the agent's
 # self-updates replace files in /opt and would drift from patched copies.
 # Product upgrades pushed from the console won't work: bump the URLs and
@@ -308,131 +312,256 @@ let
   # oaeventd and wapd load their modules from where check_start.sh would
   # have compiled them, not through modprobe.
   esetModDir = "/lib/modules/${kernel.modDirVersion}/eset/efs";
+
+  # Runtime kill switch. Every ESET unit checks this flag, so `eset off`
+  # also holds across reboots and switches without a rebuild.
+  offFlag = "/var/lib/eset/disabled";
+  unlessOff = "!${offFlag}";
+
+  eset-switch = pkgs.writeShellApplication {
+    name = "eset";
+    runtimeInputs = with pkgs; [
+      coreutils
+      gnugrep
+      kmod
+      systemd
+    ];
+    text = ''
+      units=(eset-cron.service efs.service eraagent.service)
+
+      need_root() {
+        if [ "$(id -u)" -ne 0 ]; then
+          echo "Run this with sudo." >&2
+          exit 1
+        fi
+      }
+
+      case "''${1:-status}" in
+        off)
+          need_root
+          mkdir -p ${dirOf offFlag}
+          touch ${offFlag}
+          systemctl stop "''${units[@]}" eset-efs-setup.service
+          for m in eset_wap eset_rtp; do
+            if grep -q "^$m " /proc/modules; then
+              rmmod "$m" || echo "Could not unload $m; it goes away on reboot." >&2
+            fi
+          done
+          echo "ESET is off, including after reboots, until 'sudo eset on'."
+          ;;
+        on)
+          need_root
+          rm -f ${offFlag}
+          systemctl start "''${units[@]}"
+          echo "ESET is on."
+          ;;
+        status)
+          if [ -e ${offFlag} ]; then echo "switch    off"; else echo "switch    on"; fi
+          for u in "''${units[@]}"; do
+            printf '%-9s %s\n' "''${u%.service}" "$(systemctl is-active "$u" || true)"
+          done
+          if grep -q '^eset_rtp ' /proc/modules; then echo "eset_rtp  loaded"; else echo "eset_rtp  not loaded"; fi
+          ;;
+        *)
+          echo "usage: eset [on|off|status]" >&2
+          exit 2
+          ;;
+      esac
+    '';
+  };
+
+  esetTrayScript =
+    pkgs.writers.writePython3 "eset-tray"
+      {
+        libraries = [ pkgs.python3Packages.pyqt6 ];
+        flakeIgnore = [ "E501" ];
+      }
+      (
+        builtins.replaceStrings [ "@eset@" ] [ "${eset-switch}/bin/eset" ] (
+          builtins.readFile ./eset-tray.py
+        )
+      );
+
+  eset-tray = pkgs.stdenv.mkDerivation {
+    name = "eset-tray";
+    dontUnpack = true;
+    nativeBuildInputs = [ pkgs.qt6.wrapQtAppsHook ];
+    buildInputs = with pkgs.qt6; [
+      qtbase
+      qtsvg
+      qtwayland
+    ];
+    installPhase = ''
+      install -Dm755 ${esetTrayScript} $out/bin/eset-tray
+    '';
+    # The hook only wraps ELF binaries on its own.
+    dontWrapQtApps = true;
+    postFixup = ''
+      wrapQtApp $out/bin/eset-tray
+    '';
+  };
 in
 
 {
-  boot.extraModulePackages = [
-    eset-rtp
-    eset-wap
-  ];
+  options.services.eset.enable = lib.mkEnableOption "ESET PROTECT (Management Agent and Server Security)";
 
-  # libsqlite3 is the one NEEDED library outside nix-ld's base set.
-  programs.nix-ld.enable = true;
-  programs.nix-ld.libraries = [ pkgs.sqlite ];
-
-  users.groups = lib.genAttrs [
-    "eset-efs-services"
-    "eset-efs-daemons"
-    "eset-efs-vapm"
-    "eset-efs-agents"
-  ] (_: { });
-  users.users = lib.mapAttrs (name: group: {
-    isSystemUser = true;
-    inherit group;
-    extraGroups = [ "eset-efs-services" ] ++ lib.optional (name == "eset-efs-vapmd") "eset-efs-vapm";
-    home = "/opt/eset/efs";
-  }) efsUsers;
-
-  environment.systemPackages = [ eset-agent-install ];
-
-  security.sudo.extraRules = [
-    {
-      groups = [ "eset-efs-services" ];
-      commands = [
-        {
-          command = "${btrfsSubvolume} show *";
-          options = [ "NOPASSWD" ];
-        }
-        {
-          command = "${btrfsSubvolume} list *";
-          options = [ "NOPASSWD" ];
-        }
-      ];
-    }
-  ];
-
-  # ESET schedules scans by writing jobs to /etc/cron.d, which NixOS's Vixie
-  # cron doesn't read. Run cronie for them instead.
-  assertions = [
-    {
-      assertion = !config.services.cron.enable;
-      message = "modules/eset.nix runs cronie for ESET; services.cron would run /etc/crontab twice.";
-    }
-  ];
-  # The paths follow the configured kernel, so after a kernel update
-  # real-time protection is off until the next reboot.
-  systemd.tmpfiles.rules = [
-    "d /etc/cron.d 0755 root root -"
-    "d /var/spool/cron 0700 root root -"
-    "d ${esetModDir} 0755 root root -"
-    "L+ ${esetModDir}/eset_rtp.ko - - - - ${eset-rtp}/lib/modules/${kernel.modDirVersion}/extra/eset_rtp.ko"
-    "L+ ${esetModDir}/eset_wap.ko - - - - ${eset-wap}/lib/modules/${kernel.modDirVersion}/extra/eset_wap.ko"
-  ];
-  systemd.services.eset-cron = {
-    description = "Cron daemon for ESET scheduled tasks";
-    wantedBy = [ "multi-user.target" ];
-    before = [ "efs.service" ];
-    serviceConfig = {
-      ExecStart = "${pkgs.cronie}/bin/crond -n";
-      Restart = "on-failure";
-    };
-  };
-
-  systemd.services.eset-efs-setup = {
-    description = "Install ESET Server Security files";
-    path = [ pkgs.rsync ] ++ esetPath;
-    environment = nixLdEnv;
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-      ExecStart = efsSetup;
-      # The first run unpacks and compiles ~185 MB of detection modules.
-      TimeoutStartSec = 900;
-    };
-  };
-
-  # From /opt/eset/efs/etc/systemd/efs.service, minus check_start.sh: the
-  # modules are built above, and it would find them through modinfo outside
-  # its own directory and complain.
-  systemd.services.efs = {
-    description = "ESET Server Security";
-    wantedBy = [ "multi-user.target" ];
-    requires = [ "eset-efs-setup.service" ];
-    after = [
-      "network.target"
-      "eset-efs-setup.service"
+  config = lib.mkIf config.services.eset.enable {
+    boot.extraModulePackages = [
+      eset-rtp
+      eset-wap
     ];
-    path = esetPath;
-    environment = nixLdEnv;
-    serviceConfig = {
-      Type = "notify";
-      ExecStart = "/opt/eset/efs/sbin/startd";
-      ExecStartPost = efsFirstRun;
-      KillMode = "process";
-      Restart = "always";
-      TimeoutStartSec = 180;
-      TimeoutStopSec = 120;
-      OOMScoreAdjust = -800;
-      EnvironmentFile = "-/opt/eset/efs/etc/systemd/environment";
-    };
-  };
 
-  # From the agent's setup/systemd.service, under the name its installer and
-  # self-upgrades use. Inert until eset-agent-install has run.
-  systemd.services.eraagent = {
-    description = "ESET Management Agent";
-    wantedBy = [ "multi-user.target" ];
-    after = [ "network.target" ];
-    unitConfig.ConditionPathExists = "/opt/eset/RemoteAdministrator/Agent/ERAAgent";
-    path = esetPath;
-    environment = nixLdEnv;
-    serviceConfig = {
-      Type = "forking";
-      KillMode = "process";
-      PIDFile = "/run/eraagent.pid";
-      ExecStart = "/opt/eset/RemoteAdministrator/Agent/ERAAgent --daemon --pidfile /run/eraagent.pid";
-      Restart = "on-abort";
-      RestartSec = 60;
+    # libsqlite3 is the one NEEDED library outside nix-ld's base set.
+    programs.nix-ld.enable = true;
+    programs.nix-ld.libraries = [ pkgs.sqlite ];
+
+    users.groups = lib.genAttrs [
+      "eset-efs-services"
+      "eset-efs-daemons"
+      "eset-efs-vapm"
+      "eset-efs-agents"
+    ] (_: { });
+    users.users = lib.mapAttrs (name: group: {
+      isSystemUser = true;
+      inherit group;
+      extraGroups = [ "eset-efs-services" ] ++ lib.optional (name == "eset-efs-vapmd") "eset-efs-vapm";
+      home = "/opt/eset/efs";
+    }) efsUsers;
+
+    environment.systemPackages = [
+      eset-agent-install
+      eset-switch
+    ];
+
+    # The tray toggles through pkexec: ask for the password, then keep it for
+    # a few minutes, as for sudo.
+    security.polkit.extraConfig = ''
+      polkit.addRule(function (action, subject) {
+        if (action.id == "org.freedesktop.policykit.exec" &&
+            action.lookup("program") == "${eset-switch}/bin/eset" &&
+            subject.local && subject.active && subject.isInGroup("wheel")) {
+          return polkit.Result.AUTH_ADMIN_KEEP;
+        }
+      });
+    '';
+
+    systemd.user.services.eset-tray = {
+      description = "ESET status in the system tray";
+      wantedBy = [ "graphical-session.target" ];
+      partOf = [ "graphical-session.target" ];
+      after = [ "graphical-session.target" ];
+      serviceConfig = {
+        ExecStart = "${eset-tray}/bin/eset-tray";
+        Restart = "on-failure";
+        RestartSec = 5;
+      };
+    };
+
+    security.sudo.extraRules = [
+      {
+        groups = [ "eset-efs-services" ];
+        commands = [
+          {
+            command = "${btrfsSubvolume} show *";
+            options = [ "NOPASSWD" ];
+          }
+          {
+            command = "${btrfsSubvolume} list *";
+            options = [ "NOPASSWD" ];
+          }
+        ];
+      }
+    ];
+
+    # ESET schedules scans by writing jobs to /etc/cron.d, which NixOS's Vixie
+    # cron doesn't read. Run cronie for them instead.
+    assertions = [
+      {
+        assertion = !config.services.cron.enable;
+        message = "modules/eset.nix runs cronie for ESET; services.cron would run /etc/crontab twice.";
+      }
+    ];
+    # The paths follow the configured kernel, so after a kernel update
+    # real-time protection is off until the next reboot.
+    systemd.tmpfiles.rules = [
+      "d /etc/cron.d 0755 root root -"
+      "d /var/spool/cron 0700 root root -"
+      "d ${esetModDir} 0755 root root -"
+      "L+ ${esetModDir}/eset_rtp.ko - - - - ${eset-rtp}/lib/modules/${kernel.modDirVersion}/extra/eset_rtp.ko"
+      "L+ ${esetModDir}/eset_wap.ko - - - - ${eset-wap}/lib/modules/${kernel.modDirVersion}/extra/eset_wap.ko"
+    ];
+    systemd.services.eset-cron = {
+      description = "Cron daemon for ESET scheduled tasks";
+      wantedBy = [ "multi-user.target" ];
+      before = [ "efs.service" ];
+      unitConfig.ConditionPathExists = unlessOff;
+      serviceConfig = {
+        ExecStart = "${pkgs.cronie}/bin/crond -n";
+        Restart = "on-failure";
+      };
+    };
+
+    systemd.services.eset-efs-setup = {
+      description = "Install ESET Server Security files";
+      path = [ pkgs.rsync ] ++ esetPath;
+      environment = nixLdEnv;
+      unitConfig.ConditionPathExists = unlessOff;
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        ExecStart = efsSetup;
+        # The first run unpacks and compiles ~185 MB of detection modules.
+        TimeoutStartSec = 900;
+      };
+    };
+
+    # From /opt/eset/efs/etc/systemd/efs.service, minus check_start.sh: the
+    # modules are built above, and it would find them through modinfo outside
+    # its own directory and complain.
+    systemd.services.efs = {
+      description = "ESET Server Security";
+      wantedBy = [ "multi-user.target" ];
+      requires = [ "eset-efs-setup.service" ];
+      after = [
+        "network.target"
+        "eset-efs-setup.service"
+      ];
+      path = esetPath;
+      environment = nixLdEnv;
+      unitConfig.ConditionPathExists = unlessOff;
+      serviceConfig = {
+        Type = "notify";
+        ExecStart = "/opt/eset/efs/sbin/startd";
+        ExecStartPost = efsFirstRun;
+        KillMode = "process";
+        Restart = "always";
+        TimeoutStartSec = 180;
+        TimeoutStopSec = 120;
+        OOMScoreAdjust = -800;
+        EnvironmentFile = "-/opt/eset/efs/etc/systemd/environment";
+      };
+    };
+
+    # From the agent's setup/systemd.service, under the name its installer and
+    # self-upgrades use. Inert until eset-agent-install has run.
+    systemd.services.eraagent = {
+      description = "ESET Management Agent";
+      wantedBy = [ "multi-user.target" ];
+      after = [ "network.target" ];
+      unitConfig.ConditionPathExists = [
+        "/opt/eset/RemoteAdministrator/Agent/ERAAgent"
+        unlessOff
+      ];
+      path = esetPath;
+      environment = nixLdEnv;
+      serviceConfig = {
+        Type = "forking";
+        KillMode = "process";
+        PIDFile = "/run/eraagent.pid";
+        ExecStart = "/opt/eset/RemoteAdministrator/Agent/ERAAgent --daemon --pidfile /run/eraagent.pid";
+        Restart = "on-abort";
+        RestartSec = 60;
+      };
     };
   };
 }

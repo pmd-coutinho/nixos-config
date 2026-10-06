@@ -79,6 +79,9 @@ in
     ../modules/eset.nix
   ];
 
+  # `false` drops ESET from the build; `sudo eset off` stops it without one.
+  services.eset.enable = true;
+
   boot.kernelPackages = pkgs.linuxPackages_zen;
   hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.latest;
 
