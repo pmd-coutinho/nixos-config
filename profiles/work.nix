@@ -74,7 +74,10 @@ let
 in
 
 {
-  imports = [ inputs.chatgpt-desktop.nixosModules.default ];
+  imports = [
+    inputs.chatgpt-desktop.nixosModules.default
+    ../modules/eset.nix
+  ];
 
   boot.kernelPackages = pkgs.linuxPackages_zen;
   hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.latest;
