@@ -187,8 +187,8 @@ in
   # Firmware updates (BIOS, EC, SSD) via LVFS: `fwupdmgr refresh && fwupdmgr update`.
   services.fwupd.enable = true;
 
-  # Compressed in-RAM swap for memory pressure (large builds, Rider + Docker).
-  zramSwap.enable = true;
+  # Swap is per profile: work uses zswap + a disk swapfile (large .NET builds),
+  # gaming uses zram. See profiles/work.nix and profiles/gaming.nix.
 
   # Transparent compression and no access-time writes on every btrfs mount.
   # These merge with the options in hardware-configuration.nix.

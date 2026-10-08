@@ -20,6 +20,9 @@ in
   boot.kernelPackages = pkgs.linuxPackages_cachyos;
   hardware.nvidia.package = pkgs.nvidia_cachyos;
 
+  # Compressed in-RAM swap; games don't need the disk swapfile work uses.
+  zramSwap.enable = true;
+
   programs.steam = {
     enable = true;
     # Adds a "Steam (gamescope)" session to the greeter.

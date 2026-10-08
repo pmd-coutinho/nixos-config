@@ -74,6 +74,26 @@ let
 in
 
 {
+  # Swap for memory pressure (large .NET builds, Rider + Docker).
+  # zram alone is capped at a fraction of RAM and was filling up completely;
+  # a disk swapfile gives real overflow capacity, and zswap keeps a compressed
+  # LRU cache of swapped pages in RAM so only cold pages hit the NVMe.
+  # The swapfile lives on the top-level btrfs subvolume (no snapshots there),
+  # and NixOS creates it with `btrfs filesystem mkswapfile` (NOCOW, uncompressed).
+  # The file stays on disk when booted into gaming; it is simply not activated.
+  swapDevices = [
+    {
+      device = "/swapfile";
+      size = 32 * 1024; # MiB
+    }
+  ];
+  boot.kernelParams = [
+    "zswap.enabled=1"
+    "zswap.compressor=zstd"
+    "zswap.max_pool_percent=25"
+    "zswap.shrinker_enabled=1"
+  ];
+
   imports = [
     inputs.chatgpt-desktop.nixosModules.default
     ../modules/eset.nix
