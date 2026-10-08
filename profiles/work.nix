@@ -188,5 +188,6 @@ in
     omp
     tuios
     azure-cli
+    bruno
   ];
 }
