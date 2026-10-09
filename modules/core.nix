@@ -187,6 +187,9 @@ in
     };
   };
 
+  # Throttles the CPU before it overheats, using the firmware's DPTF tables.
+  services.thermald.enable = true;
+
   # Firmware updates (BIOS, EC, SSD) via LVFS: `fwupdmgr refresh && fwupdmgr update`.
   services.fwupd.enable = true;
 
