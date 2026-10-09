@@ -46,7 +46,10 @@ let
   };
 in
 {
-  imports = [ ../modules/ai-tools.nix ];
+  imports = [
+    ../modules/ai-tools.nix
+    ../modules/sunshine.nix
+  ];
 
   # Chaotic Nyx provides this upstream-parity CachyOS kernel and its cache.
   boot.kernelPackages = pkgs.linuxPackages_cachyos;
@@ -95,15 +98,6 @@ in
   # NVIDIA trims its shader cache at ~1 GB, so switching between big games
   # means recompiling shaders (stutter). Keep everything.
   environment.sessionVariables.__GL_SHADER_DISK_CACHE_SKIP_CLEANUP = "1";
-
-  services.sunshine = {
-    enable = true;
-    capSysAdmin = true;
-    openFirewall = true;
-    # nixpkgs builds without CUDA by default, so NVENC can't dlopen
-    # libcuda.so.1 and Sunshine silently falls back to libx264.
-    package = pkgs.sunshine.override { cudaSupport = true; };
-  };
 
   # Gaming-only packages and settings belong here.
   environment.systemPackages = with pkgs; [
