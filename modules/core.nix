@@ -36,6 +36,9 @@ in
   # Keep five recent generations; each includes a work and a gaming entry.
   boot.loader.systemd-boot.configurationLimit = 5;
   boot.loader.efi.canTouchEfiVariables = true;
+  # /tmp lives on disk and build scratch (nix-shell, MSBuild) piles up there.
+  # Not tmpfs: those dirs reach tens of GB.
+  boot.tmp.cleanOnBoot = true;
 
   boot.extraModulePackages = [ msi-ec ];
   boot.kernelModules = [
