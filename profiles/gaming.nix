@@ -136,11 +136,42 @@ in
   # means recompiling shaders (stutter). Keep everything.
   environment.sessionVariables.__GL_SHADER_DISK_CACHE_SKIP_CLEANUP = "1";
 
+  # FPS, temperature and power overlay: `mangohud %command%` in a game's
+  # launch options, toggled with Right Shift + F12. One thin row along the
+  # top instead of the default panel; no frametime graph.
+  home-manager.users.pedrocoutinho.programs.mangohud = {
+    enable = true;
+    settings = {
+      position = "top-left";
+      horizontal = true;
+      horizontal_stretch = false;
+      hud_compact = true;
+      hud_no_margin = true;
+      font_size = 18;
+      background_alpha = 0.4;
+      fps = true;
+      frametime = true;
+      frame_timing = false;
+      cpu_stats = true;
+      cpu_temp = true;
+      cpu_power = true;
+      gpu_stats = true;
+      # Only the RTX 4080, not the idle Intel iGPU.
+      pci_dev = "0000:01:00.0";
+      gpu_temp = true;
+      gpu_power = true;
+    };
+  };
+  # MangoHud reads CPU power from RAPL's energy counter, which is root-only
+  # since the PLATYPUS power side channel; fine to open on a single-user
+  # gaming entry.
+  services.udev.extraRules = ''
+    SUBSYSTEM=="powercap", KERNEL=="intel-rapl:0", RUN+="${pkgs.coreutils}/bin/chmod 0444 /sys%p/energy_uj"
+  '';
+
   # Gaming-only packages and settings belong here.
-  environment.systemPackages = with pkgs; [
-    bottles
+  environment.systemPackages = [
+    pkgs.bottles
     gamingHelium
-    # FPS/frametime overlay: `mangohud %command%` in a game's launch options.
-    mangohud
   ];
 }
