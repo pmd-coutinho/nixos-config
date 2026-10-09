@@ -32,8 +32,8 @@ in
     "zswap.max_pool_percent=25"
     "zswap.shrinker_enabled=1"
   ];
-  # Kill the worst offender in the user session once swap passes 90%, instead
-  # of thrashing when a build runs away.
+  # When the user session thrashes (stalled on memory >80% of the time for
+  # 30s), kill the app causing it instead of freezing during a runaway build.
   systemd.oomd.enableUserSlices = true;
 
   imports = [
