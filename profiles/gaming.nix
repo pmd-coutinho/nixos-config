@@ -16,6 +16,8 @@ let
   );
 in
 {
+  imports = [ ../modules/ai-tools.nix ];
+
   # Chaotic Nyx provides this upstream-parity CachyOS kernel and its cache.
   boot.kernelPackages = pkgs.linuxPackages_cachyos;
   hardware.nvidia.package = pkgs.nvidia_cachyos;
