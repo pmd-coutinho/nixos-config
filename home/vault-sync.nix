@@ -50,7 +50,7 @@ in
     enable = true;
     socket = "ssh-agent.socket";
   };
-  # Set it before the session starts too, so apps launched by Hyprland see it.
+  # Set it before the session starts too, so apps the compositor starts see it.
   systemd.user.sessionVariables.SSH_AUTH_SOCK = "\${XDG_RUNTIME_DIR}/ssh-agent.socket";
 
   systemd.user.services = {

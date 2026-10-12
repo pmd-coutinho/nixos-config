@@ -3,6 +3,7 @@
 {
   imports = [
     inputs.noctalia.nixosModules.default
+    inputs.umbriel.nixosModules.default
   ];
 
   environment.systemPackages = with pkgs; [
@@ -50,6 +51,10 @@
     enable = true;
     withUWSM = true;
   };
+  # A second greeter session beside Hyprland, with its screencast and
+  # screenshot portal. start-umbriel runs it as a systemd user service, so it
+  # needs no UWSM. Its config is Home Manager's (home/umbriel.nix).
+  programs.umbriel.enable = true;
 
   # Use Noctalia's generated palette for Qt 5 and Qt 6 apps (see home/desktop.nix).
   # The NixOS qt5ct platform theme installs both qt5ct and qt6ct plugins.

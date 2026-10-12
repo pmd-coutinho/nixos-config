@@ -31,7 +31,8 @@ in
 
   programs.ghostty = {
     enable = true;
-    # Ghostty is launched directly from Hyprland, not as a systemd service.
+    # The compositor (Hyprland or Umbriel) launches Ghostty directly, not as a
+    # systemd service.
     systemd.enable = false;
     settings = {
       # Noctalia generates themes/noctalia; its hook leaves this file alone

@@ -15,20 +15,68 @@ let
   sunshine = pkgs.sunshine.override { cudaSupport = true; };
 
   hyprctl = lib.getExe' config.programs.hyprland.package "hyprctl";
+  umbriel = lib.getExe config.programs.umbriel.package;
   steam = lib.getExe config.programs.steam.package;
   setsid = lib.getExe' pkgs.util-linux "setsid";
 
   # Stream only the laptop panel: externals are disabled for the session and
-  # `hyprctl reload` restores them from hyprland.lua afterwards.
+  # restored afterwards, by whichever compositor is running. Hyprland matches
+  # monitors by description (commas dropped) and `hyprctl reload` restores
+  # them from hyprland.lua. Umbriel takes the names from `umbriel outputs`;
+  # its disable is temporary, so each output is enabled again by name.
+  # Once Hyprland is gone, an Umbriel virtual output (`umbriel output-create`)
+  # sized to the client is the nicer target than the laptop panel.
   externalMonitors = [
-    "GIGA-BYTE TECHNOLOGY CO. LTD. M28U 22010B004763"
-    "Huawei Technologies Co. Inc. HUAWEI AD80HW"
+    {
+      hyprland = "GIGA-BYTE TECHNOLOGY CO. LTD. M28U 22010B004763";
+      umbriel = "GIGA-BYTE TECHNOLOGY CO., LTD. M28U 22010B004763";
+    }
+    {
+      hyprland = "Huawei Technologies Co. Inc. HUAWEI AD80HW";
+      # Its EDID serial is blank spaces, so the connector is the safer name.
+      umbriel = "HDMI-A-2";
+    }
   ];
-  disableExternals = pkgs.writeShellScript "sunshine-disable-externals" ''
-    ${lib.concatMapStrings (desc: ''
-      ${hyprctl} eval "hl.monitor({output='desc:${desc}', disabled=true})" || true
-    '') externalMonitors}
-  '';
+  umbrielMsg = action: "${umbriel} msg ${lib.escapeShellArg action} || true";
+  # The Umbriel check asks the compositor itself, so a stale socket or
+  # environment variable left by an earlier session can't fool it. Each
+  # branch is a list of command lines.
+  prepScript =
+    name:
+    { umbrielCmds, hyprlandCmds }:
+    pkgs.writeShellScript "sunshine-${name}" ''
+      if ${umbriel} outputs >/dev/null 2>&1; then
+      ${lib.concatStringsSep "\n" umbrielCmds}
+      else
+      ${lib.concatStringsSep "\n" hyprlandCmds}
+      fi
+    '';
+  disableExternals = prepScript "disable-externals" {
+    # The lid event may have taken the panel out of the desktop.
+    umbrielCmds = [
+      (umbrielMsg "output-enable:eDP-1")
+    ]
+    ++ map (m: umbrielMsg "output-disable:${m.umbriel}") externalMonitors;
+    hyprlandCmds = map (
+      m: ''${hyprctl} eval "hl.monitor({output='desc:${m.hyprland}', disabled=true})" || true''
+    ) externalMonitors;
+  };
+  # Umbriel keeps a disable until something enables the output again, so if
+  # Sunshine dies mid-stream the externals stay off; bring them back with
+  # `umbriel msg output-enable:<name>` (names as above).
+  restoreExternals = prepScript "restore-externals" {
+    # If the lid is still closed, take the panel back out as lid_close in
+    # home/umbriel.nix would, but only once an external is on again.
+    umbrielCmds = map (m: umbrielMsg "output-enable:${m.umbriel}") externalMonitors ++ [
+      ''
+        if ${lib.getExe pkgs.gnugrep} -qs closed /proc/acpi/button/lid/*/state \
+          && ${umbriel} outputs --json \
+            | ${lib.getExe pkgs.jq} -e 'any(.[]; .enabled and .name != "eDP-1")' >/dev/null; then
+          ${umbrielMsg "output-disable:eDP-1"}
+        fi''
+    ];
+    hyprlandCmds = [ "${hyprctl} reload" ];
+  };
 
   # Moonlight shows portrait 2:3 box art and Sunshine only reads PNG.
   cover =
@@ -52,14 +100,14 @@ in
 
     settings = {
       output_name = "eDP-1";
-      # Hyprland's screencopy works; pinning it skips the failing portal and
-      # KMS probes at startup.
+      # Hyprland's and Umbriel's screencopy both work; pinning it skips the
+      # failing portal and KMS probes at startup.
       capture = "wlr";
       encoder = "nvenc";
       global_prep_cmd = builtins.toJSON [
         {
           do = "${disableExternals}";
-          undo = "${hyprctl} reload";
+          undo = "${restoreExternals}";
         }
       ];
     };

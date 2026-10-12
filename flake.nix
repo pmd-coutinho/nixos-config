@@ -27,6 +27,13 @@
       url = "github:noctalia-dev/noctalia";
       inputs.nixpkgs.follows = "nixpkgs"; # this line is optional, prevents downloading two versions of nixpkgs but disables cache
     };
+    umbriel = {
+      url = "github:noctalia-dev/umbriel";
+      # Build against our nixpkgs so Umbriel's wlroots and mesa match the
+      # system graphics stack. That gives up umbriel.cachix.org: Umbriel
+      # compiles locally (a few minutes) whenever the two nixpkgs pins differ.
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     hyprmod = {
       url = "github:BlueManCZ/hyprmod";
       inputs.nixpkgs.follows = "nixpkgs";
