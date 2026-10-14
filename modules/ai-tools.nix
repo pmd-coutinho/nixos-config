@@ -26,6 +26,14 @@ let
   # each write). Pruning at the first node_modules gives the same output; the
   # fixed-output hash fails the build if it ever doesn't.
   node_modules = opencodePkgs.opencode.node_modules.overrideAttrs (old: {
+    # The CLI build now imports the root script/native-arch.ts, which upstream's
+    # source fileset leaves out. The CLI and desktop take their src from here.
+    # Drop once anomalyco/opencode#55494 is merged.
+    src = pkgs.runCommand "source" { } ''
+      cp -r ${old.src} $out
+      chmod u+w $out
+      cp -r ${inputs.opencode}/script $out/script
+    '';
     installPhase =
       assert lib.hasInfix "-name node_modules -exec" old.installPhase;
       builtins.replaceStrings [ "-name node_modules -exec" ] [ "-name node_modules -prune -exec" ]
