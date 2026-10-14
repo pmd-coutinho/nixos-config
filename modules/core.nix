@@ -36,6 +36,10 @@ in
   # Keep five recent generations; each includes a work and a gaming entry.
   boot.loader.systemd-boot.configurationLimit = 5;
   boot.loader.efi.canTouchEfiVariables = true;
+  # Windows lives on the T-Force NVMe, which has its own ESP. systemd-boot
+  # chainloads it through the EDK2 shell. HD0b is that ESP's handle from
+  # `map -c` in the shell (found with edk2-uefi-shell.enable).
+  boot.loader.systemd-boot.windows."11".efiDeviceHandle = "HD0b";
   # /tmp lives on disk and build scratch (nix-shell, MSBuild) piles up there.
   # Not tmpfs: those dirs reach tens of GB.
   boot.tmp.cleanOnBoot = true;
