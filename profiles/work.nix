@@ -127,6 +127,7 @@ in
     pi-coding-agent
     omp
     tuios
+    herdr
     azure-cli
     bruno
   ];
