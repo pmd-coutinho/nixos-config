@@ -43,6 +43,11 @@ in
   # `false` drops ESET from the build; `sudo eset off` stops it without one.
   services.eset.enable = true;
 
+  # Trust the ASP.NET Core dev cert (`dotnet dev-certs https`) for OpenSSL
+  # clients: Kestrel, HttpClient, curl. Only the public cert is kept here; the
+  # key stays in ~/.dotnet. Copy it again after a regenerate (expires 2027-09-25).
+  security.pki.certificateFiles = [ ../certs/aspnet-dev.crt ];
+
   boot.kernelPackages = pkgs.linuxPackages_zen;
   hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.latest;
 
