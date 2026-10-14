@@ -1,5 +1,4 @@
-# Zed for .NET work. Imported from profiles/work.nix only, so the gaming entry
-# does not get it. Noctalia ships no Zed template, so Home Manager may own
+# Zed for .NET work, imported from profiles/work.nix. Noctalia ships no Zed template, so Home Manager may own
 # these files; they stay mutable and the values below are merged over
 # whatever Zed saved on every switch.
 { lib, pkgs, ... }:

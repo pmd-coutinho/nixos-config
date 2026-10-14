@@ -1,5 +1,4 @@
-# AI tools shared by the work and gaming profiles: ChatGPT desktop, Codex,
-# and OpenCode (CLI + desktop).
+# AI tools: ChatGPT desktop, Codex, and OpenCode (CLI + desktop).
 {
   inputs,
   lib,

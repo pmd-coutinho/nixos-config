@@ -1,6 +1,5 @@
-# Shared by both boot entries: work (the default, configuration.nix) and gaming
-# (a specialisation that inherits nothing from work). Each entry picks its own
-# kernel and NVIDIA driver in its profile.
+# Hardware, boot and desktop settings that don't belong to a profile. The
+# kernel and NVIDIA driver are picked in profiles/work.nix.
 
 {
   config,
@@ -24,16 +23,12 @@ in
     ../noctalia.nix
     ./keepassxc-sync.nix
     ./msi-mux.nix
-    # Also needed in work: it configures the Chaotic Nyx binary cache, so
-    # building the gaming entry from work downloads its kernel instead of
-    # compiling it.
-    inputs.chaotic.nixosModules.default
     inputs.home-manager.nixosModules.home-manager
   ];
 
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
-  # Keep five recent generations; each includes a work and a gaming entry.
+  # Keep five recent generations.
   boot.loader.systemd-boot.configurationLimit = 5;
   boot.loader.efi.canTouchEfiVariables = true;
   # Windows lives on the T-Force NVMe, which has its own ESP. systemd-boot
@@ -197,8 +192,7 @@ in
   # Firmware updates (BIOS, EC, SSD) via LVFS: `fwupdmgr refresh && fwupdmgr update`.
   services.fwupd.enable = true;
 
-  # Swap is per profile: work uses zswap + a disk swapfile (large .NET builds),
-  # gaming uses zram. See profiles/work.nix and profiles/gaming.nix.
+  # Swap (zswap + a disk swapfile for large .NET builds) is in profiles/work.nix.
 
   # Transparent compression and no access-time writes on every btrfs mount.
   # These merge with the options in hardware-configuration.nix.

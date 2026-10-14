@@ -19,7 +19,6 @@ in
   # LRU cache of swapped pages in RAM so only cold pages hit the NVMe.
   # The swapfile lives on the top-level btrfs subvolume (no snapshots there),
   # and NixOS creates it with `btrfs filesystem mkswapfile` (NOCOW, uncompressed).
-  # The file stays on disk when booted into gaming; it is simply not activated.
   swapDevices = [
     {
       device = "/swapfile";

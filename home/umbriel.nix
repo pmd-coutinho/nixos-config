@@ -121,9 +121,9 @@ in
         autostart = [ "noctalia" ];
         mod_key = "Super";
         xwayland = true;
-        # X11 apps and Proton games see the M28U at 3840x2160 instead of being
-        # upscaled from its 1.5 scale: sharp, but X11 apps that don't scale
-        # themselves (Steam's client) look smaller there than under Hyprland.
+        # X11 apps see the M28U at 3840x2160 instead of being upscaled from
+        # its 1.5 scale: sharp, but X11 apps that don't scale themselves look
+        # smaller there than under Hyprland.
         xwayland_native_resolution = true;
         show_cheatsheet = false;
         focus_on_activate = false;
@@ -145,7 +145,7 @@ in
       # With an external on, closing the lid moves the panel's windows onto
       # the externals; opening it brings them back. The panel's workspaces
       # stay on it while it is off, so Mod+1-4 (focus goes there too),
-      # Mod+Shift+1-4 and new Slack, AyuGram or game windows land out of
+      # Mod+Shift+1-4 and new Slack or AyuGram windows land out of
       # sight until the lid opens, as under Hyprland, which kept the panel on
       # behind the closed lid.
       events = {
@@ -170,7 +170,6 @@ in
           ];
           scale = 1.0;
           vrr = "fullscreen";
-          tearing = true;
           workspaces = lib.sublist 0 4 workspaceNames;
         };
         "GIGA-BYTE TECHNOLOGY CO., LTD. M28U 22010B004763" = {
@@ -181,7 +180,6 @@ in
           ];
           scale = 1.5;
           vrr = "fullscreen";
-          tearing = true;
           workspaces = lib.sublist 4 4 workspaceNames;
         };
         HDMI-A-2 = {
@@ -313,7 +311,6 @@ in
 
         (placeOn "web" "^slack$")
         (placeOn "code" "^com[.]ayugram[.]desktop$")
-        (placeOn "game" "^steam_app_.*$")
         (placeOn "design" "^com[.]mitchellh[.]ghostty$")
         (placeOn "6" "^code$")
         (placeOn "7" "^jetbrains-rider$")
@@ -330,23 +327,6 @@ in
         #   match.title = "^New Incognito Tab - Helium$";
         #   default_workspace = "8";
         # }
-
-        # Tearing needs the output's `tearing = true` as well, and only applies
-        # to a fullscreen window.
-        {
-          match.app_id = "^(steam_app_.*|gamescope)$";
-          tearing = true;
-        }
-        {
-          match.content_type = "game";
-          tearing = true;
-        }
-        # Keeps game menus from losing the pointer to another monitor; a focus
-        # or workspace bind releases it.
-        {
-          match.app_id = "^steam_app_.*$";
-          confine_pointer = true;
-        }
       ];
 
       # Noctalia draws translucent surfaces and animates them itself (layer
