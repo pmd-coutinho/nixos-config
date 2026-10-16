@@ -117,6 +117,10 @@ in
       "wheel"
     ];
     packages = with pkgs; [ ];
+    # Public keys that may log in over SSH (services.openssh below).
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICiV+UltbcZxlheRZmGQ6vdzXFsi0y6UXu+d18f0z8aB @archlinux"
+    ];
   };
 
   # zsh must be enabled system-wide to be a login shell. Its interactive
