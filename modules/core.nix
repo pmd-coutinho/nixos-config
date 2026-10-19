@@ -209,6 +209,13 @@ in
       9
       10
       11
+    ]
+    ++ [
+      # Hyprland runs through a cap_sys_nice wrapper, so glibc strips TZDIR
+      # from everything it launches. .NET then looks in /usr/share/zoneinfo,
+      # which NixOS lacks, and every TimeZoneInfo lookup throws.
+      "d /usr/share 0755 root root -"
+      "L+ /usr/share/zoneinfo - - - - /etc/zoneinfo"
     ];
 
   # Firmware updates (BIOS, EC, SSD) via LVFS: `fwupdmgr refresh && fwupdmgr update`.
