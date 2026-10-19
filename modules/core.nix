@@ -47,6 +47,24 @@ in
   # Required by MControlCenter for EC temperature and fan-curve access.
   boot.extraModprobeConfig = "options ec_sys write_support=1";
 
+  # MControlCenter in the tray from login (it starts hidden; launching it
+  # again opens the window). On start it re-applies the last "User Mode"
+  # picked in its window, which would override the shift mode of Noctalia's
+  # power profile (noctalia.nix), so that one saved key is dropped first.
+  # Fan curves, battery and the other saved settings still apply.
+  systemd.user.services.mcontrolcenter = {
+    description = "MControlCenter in the system tray";
+    wantedBy = [ "graphical-session.target" ];
+    partOf = [ "graphical-session.target" ];
+    after = [ "graphical-session.target" ];
+    serviceConfig = {
+      ExecStartPre = "-${pkgs.gnused}/bin/sed -i '/^UserMode=/d' %h/.config/MControlCenter.conf";
+      ExecStart = "${pkgs.mcontrolcenter}/bin/mcontrolcenter";
+      Restart = "on-failure";
+      RestartSec = 5;
+    };
+  };
+
   networking.hostName = "pedrocoutinho-nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
