@@ -194,6 +194,23 @@ in
   # Throttles the CPU before it overheats, using the firmware's DPTF tables.
   services.thermald.enable = true;
 
+  # Corrected machine checks (Bank 0, internal parity) keep landing on CPUs
+  # 8-11, the two 5.8 GHz favoured P-cores. rasdaemon records each one:
+  # `sudo ras-mc-ctl --summary` / `--errors`. Across boots, the journal has
+  # them too: `journalctl _TRANSPORT=kernel -g 'Machine Check'`.
+  hardware.rasdaemon.enable = true;
+  # Experiment from 2026-10-19 for two weeks: hold those cores at the 5.6 GHz
+  # the other P-cores top out at, to see whether the errors come from the
+  # 5.8 GHz boost step. Check it holds with
+  # `cat /sys/devices/system/cpu/cpu{8..11}/cpufreq/scaling_max_freq`.
+  systemd.tmpfiles.rules =
+    map (cpu: "w /sys/devices/system/cpu/cpu${toString cpu}/cpufreq/scaling_max_freq - - - - 5600000") [
+      8
+      9
+      10
+      11
+    ];
+
   # Firmware updates (BIOS, EC, SSD) via LVFS: `fwupdmgr refresh && fwupdmgr update`.
   services.fwupd.enable = true;
 
