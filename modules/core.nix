@@ -115,6 +115,7 @@ in
     extraGroups = [
       "networkmanager"
       "wheel"
+      "dialout" # serial ports, e.g. ZMK Studio over USB
     ];
     packages = with pkgs; [ ];
     # Public keys that may log in over SSH (services.openssh below).
