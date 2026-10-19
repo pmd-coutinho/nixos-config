@@ -59,9 +59,17 @@ in
   virtualisation.docker = {
     enable = true;
     rootless.enable = false;
+    # Start dockerd on first use through docker.socket instead of at boot.
+    # Containers with a restart policy come back when something first touches
+    # the socket.
+    enableOnBoot = false;
     # Weekly `docker system prune`: stopped containers, dangling images,
-    # unused networks and build cache. Volumes are left alone.
-    autoPrune.enable = true;
+    # unused networks, build cache, and anonymous volumes no container uses.
+    # Named volumes (nopcommerce-mssql-*, ...) are kept.
+    autoPrune = {
+      enable = true;
+      flags = [ "--volumes" ];
+    };
   };
   users.users.pedrocoutinho.extraGroups = [ "docker" ];
 
