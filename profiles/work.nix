@@ -34,6 +34,10 @@ in
   # When the user session thrashes (stalled on memory >80% of the time for
   # 30s), kill the app causing it instead of freezing during a runaway build.
   systemd.oomd.enableUserSlices = true;
+  # oomd kills whole cgroups, and the compositor's unit is the biggest leaf in
+  # session.slice. Make it the last pick, so a runaway app goes first.
+  systemd.user.services."wayland-wm@".serviceConfig.ManagedOOMPreference = "avoid";
+  systemd.user.services.umbriel.serviceConfig.ManagedOOMPreference = "avoid";
 
   imports = [
     ../modules/ai-tools.nix
