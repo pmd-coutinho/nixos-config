@@ -63,7 +63,42 @@
     platformTheme = "qt5ct";
   };
 
-  services.tuned.enable = true;
+  # Noctalia's power profiles go through tuned-ppd. tuned's stock profiles
+  # reach the EC through ACPI platform_profile, which this laptop lacks, so
+  # each profile below also sets msi-ec's shift mode. 'turbo' stays unused:
+  # msi-ec describes it as over-voltage and overclock. Performance keeps the
+  # balanced base with EPP performance, instead of the server profile's
+  # governor=performance + min_perf_pct=100, which pins every core at max turbo.
+  services.tuned = {
+    enable = true;
+    profiles = {
+      msi-powersave = {
+        main.include = "powersave";
+        sysfs."/sys/devices/platform/msi-ec/shift_mode" = "eco";
+      };
+      msi-balanced = {
+        main.include = "balanced";
+        sysfs."/sys/devices/platform/msi-ec/shift_mode" = "comfort";
+      };
+      msi-balanced-battery = {
+        main.include = "balanced-battery";
+        sysfs."/sys/devices/platform/msi-ec/shift_mode" = "eco";
+      };
+      msi-performance = {
+        main.include = "balanced";
+        cpu.energy_performance_preference = "performance";
+        sysfs."/sys/devices/platform/msi-ec/shift_mode" = "comfort";
+      };
+    };
+    ppdSettings = {
+      profiles = {
+        power-saver = "msi-powersave";
+        balanced = "msi-balanced";
+        performance = "msi-performance";
+      };
+      battery.balanced = "msi-balanced-battery";
+    };
+  };
   services.upower.enable = true;
   # Drive discovery and user mounting for Nautilus/Thunar.
   services.gvfs.enable = true;
