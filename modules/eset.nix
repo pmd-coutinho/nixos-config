@@ -66,8 +66,16 @@ let
         "KDIR=${kernel.dev}/lib/modules/${kernel.modDirVersion}/build"
       ];
       buildFlags = [ "modules" ];
+      # nixpkgs signs every module with kmodigest (normally in the kernel's
+      # modules_install rule) and the module aggregator expects a
+      # <module>.ko.cer next to each one, so sign the hand-installed module too.
+      # Strip before signing: the signature is appended to the file, and the
+      # fixup phase's strip would run after it.
+      dontStrip = true;
       installPhase = ''
-        install -Dm444 ${name}/${name}.ko -t $out/lib/modules/${kernel.modDirVersion}/extra
+        install -Dm644 ${name}/${name}.ko -t $out/lib/modules/${kernel.modDirVersion}/extra
+        strip --strip-debug $out/lib/modules/${kernel.modDirVersion}/extra/${name}.ko
+        ${lib.getExe pkgs.buildPackages.kmodigest} $out/lib/modules/${kernel.modDirVersion}/extra/${name}.ko
       '';
     };
 
