@@ -1,7 +1,6 @@
 # AI tools: ChatGPT desktop, Codex, and OpenCode (CLI + desktop).
 {
   inputs,
-  lib,
   pkgs,
   ...
 }:
@@ -17,38 +16,10 @@ let
             old.postFixup;
       });
 
-  # OpenCode v2 isn't in nixpkgs yet, so build it from upstream's flake.
-  opencodePkgs = inputs.opencode.packages.${pkgs.stdenv.hostPlatform.system};
-
-  # Upstream's installPhase runs one `cp -R` per node_modules directory,
-  # including the ones nested inside node_modules/.bun that the top-level copy
-  # already covers, so every file is written twice (slow with ESET scanning
-  # each write). Pruning at the first node_modules gives the same output; the
-  # fixed-output hash fails the build if it ever doesn't.
-  node_modules = opencodePkgs.opencode.node_modules.overrideAttrs (old: {
-    installPhase =
-      assert lib.hasInfix "-name node_modules -exec" old.installPhase;
-      builtins.replaceStrings [ "-name node_modules -exec" ] [ "-name node_modules -prune -exec" ]
-        old.installPhase;
-  });
-
-  # Upstream builds the CLI as channel "prod", which registers the background
-  # service in service-prod.json. The desktop client only looks for
-  # service.json and spins on "loading" forever. Official releases use "latest".
-  opencode = (opencodePkgs.opencode.override { inherit node_modules; }).overrideAttrs (old: {
-    env = old.env // {
-      OPENCODE_CHANNEL = "latest";
-    };
-  });
-
-  # The desktop inherits the CLI's env, but its own code expects "prod".
-  opencodeDesktop =
-    (opencodePkgs.opencode-desktop.override { inherit opencode; }).overrideAttrs
-      (old: {
-        env = old.env // {
-          OPENCODE_CHANNEL = "prod";
-        };
-      });
+  # OpenCode v2 reached nixpkgs-unstable before nixos-unstable. Take it from
+  # there (prebuilt in the binary cache) until nixos-unstable catches up, then
+  # switch to pkgs and drop the nixpkgs-unstable input.
+  unstablePkgs = inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
 in
 
 {
@@ -62,7 +33,7 @@ in
 
   environment.systemPackages = [
     pkgs.codex
-    opencode
-    opencodeDesktop
+    unstablePkgs.opencode
+    unstablePkgs.opencode-desktop
   ];
 }

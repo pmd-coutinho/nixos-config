@@ -2,6 +2,8 @@
   description = "My NixOS configuration";
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    # Only for OpenCode v2 until nixos-unstable has it (see modules/ai-tools.nix).
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -35,10 +37,6 @@
     };
     hyprmod = {
       url = "github:BlueManCZ/hyprmod";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    opencode = {
-      url = "github:anomalyco/opencode/dev";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     msi-ec = {
