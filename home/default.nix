@@ -23,6 +23,7 @@
   home.packages = with pkgs; [
     btop
     tmux
+    yt-dlp
   ];
 
   # Same rule as system.stateVersion: set once, do not bump on upgrades.
