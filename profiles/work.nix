@@ -103,16 +103,6 @@ in
         ];
       });
     })
-    # omp's v18.11.0 tag was moved after nixpkgs pinned it, so the source hash
-    # no longer matches and Hydra never cached a build. Drop once nixos-unstable
-    # ships omp 18.11.1 or later.
-    (final: prev: {
-      omp = prev.omp.overrideAttrs (old: {
-        src = old.src.overrideAttrs {
-          outputHash = "sha256-pIAoAc3vE8nfVacsY+IEGcQVFCfMvVrK5qPcxi7NTho=";
-        };
-      });
-    })
   ];
   networking.networkmanager.plugins = [ pkgs.networkmanager-openvpn ];
   # Let both clients install split-DNS routes for internal work domains without
