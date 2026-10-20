@@ -185,6 +185,7 @@ in
     bibata-cursors
     ayugram-desktop
     filezilla # FTP, FTPS and SFTP client
+    iptvnator # IPTV player with Xtream Codes support
     nodejs
     (python3.withPackages (ps: [ ps.pip ]))
     uv
