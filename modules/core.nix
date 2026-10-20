@@ -184,6 +184,7 @@ in
     mcontrolcenter
     bibata-cursors
     ayugram-desktop
+    filezilla # FTP, FTPS and SFTP client
     nodejs
     (python3.withPackages (ps: [ ps.pip ]))
     uv
