@@ -10,6 +10,13 @@ let
   claudeDesktop = inputs.claude-desktop.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
   tuios = inputs.tuios.packages.${pkgs.stdenv.hostPlatform.system}.tuios;
+
+  # nixpkgs bumped invoke to 3.x, which fabric doesn't support yet
+  # (fabric/fabric#2376), so fabric is marked broken and azure-cli, which
+  # imports it for `az webapp`, won't evaluate. Take the same azure-cli 2.91.0
+  # from the last nixpkgs with invoke 2.2.1 (prebuilt in the cache). Drop this
+  # and the nixpkgs-azure-cli input once pkgs.azure-cli evaluates again.
+  azureCli = inputs.nixpkgs-azure-cli.legacyPackages.${pkgs.stdenv.hostPlatform.system}.azure-cli;
 in
 
 {
@@ -150,7 +157,7 @@ in
     omp
     tuios
     herdr
-    azure-cli
+    azureCli
     bruno
   ];
 }

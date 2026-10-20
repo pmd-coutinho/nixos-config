@@ -4,6 +4,9 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     # Only for OpenCode v2 until nixos-unstable has it (see modules/ai-tools.nix).
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    # Only for azure-cli while its fabric dependency is broken by invoke 3
+    # (see profiles/work.nix). The last nixos-unstable with invoke 2.2.1.
+    nixpkgs-azure-cli.url = "github:NixOS/nixpkgs/fe13242281a67641c0102cdb1087f0ebe586c7df";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
