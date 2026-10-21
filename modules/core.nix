@@ -52,8 +52,14 @@ in
     "msi-ec"
     "ec_sys"
   ];
-  # Required by MControlCenter for EC temperature and fan-curve access.
-  boot.extraModprobeConfig = "options ec_sys write_support=1";
+  # ec_sys write support: required by MControlCenter for EC temperature and
+  # fan-curve access.
+  # btusb autosuspend off: the Intel BE200 Bluetooth adapter drops headset call
+  # audio (HFP/SCO) mid-meeting; USB autosuspend is a known cause on Intel BT.
+  boot.extraModprobeConfig = ''
+    options ec_sys write_support=1
+    options btusb enable_autosuspend=0
+  '';
 
   # MControlCenter in the tray from login (it starts hidden; launching it
   # again opens the window). On start it re-applies the last "User Mode"
