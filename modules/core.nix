@@ -26,15 +26,23 @@ in
     inputs.home-manager.nixosModules.home-manager
   ];
 
-  # Use the systemd-boot EFI boot loader.
-  boot.loader.systemd-boot.enable = true;
-  # Keep five recent generations.
-  boot.loader.systemd-boot.configurationLimit = 5;
+  boot.loader.limine = {
+    enable = true;
+    # Keep five recent generations, matching nh clean --keep 5.
+    maxGenerations = 5;
+    # Install to the ESP's fallback path (\EFI\BOOT\BOOTX64.EFI), not through
+    # an NVRAM entry. The NixOS installer replaces any boot entry named
+    # "Limine", and CachyOS's own entry has that name.
+    efiInstallAsRemovable = true;
+    # CachyOS lives on the T-Force NVMe with its own ESP and its own Limine;
+    # chainload that by the ESP's PARTUUID.
+    extraEntries = ''
+      /CachyOS
+          protocol: efi
+          path: guid(790b329b-80c7-4aea-a299-2fa475c91d49):/EFI/limine/limine_x64.efi
+    '';
+  };
   boot.loader.efi.canTouchEfiVariables = true;
-  # Windows lives on the T-Force NVMe, which has its own ESP. systemd-boot
-  # chainloads it through the EDK2 shell. HD0b is that ESP's handle from
-  # `map -c` in the shell (found with edk2-uefi-shell.enable).
-  boot.loader.systemd-boot.windows."11".efiDeviceHandle = "HD0b";
   # /tmp lives on disk and build scratch (nix-shell, MSBuild) piles up there.
   # Not tmpfs: those dirs reach tens of GB.
   boot.tmp.cleanOnBoot = true;
