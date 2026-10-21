@@ -15,11 +15,6 @@ let
           builtins.replaceStrings [ "--ozone-platform-hint=auto" ] [ "--ozone-platform=wayland" ]
             old.postFixup;
       });
-
-  # OpenCode v2 reached nixpkgs-unstable before nixos-unstable. Take it from
-  # there (prebuilt in the binary cache) until nixos-unstable catches up, then
-  # switch to pkgs and drop the nixpkgs-unstable input.
-  unstablePkgs = inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
 in
 
 {
@@ -33,7 +28,7 @@ in
 
   environment.systemPackages = [
     pkgs.codex
-    unstablePkgs.opencode
-    unstablePkgs.opencode-desktop
+    pkgs.opencode
+    pkgs.opencode-desktop
   ];
 }
