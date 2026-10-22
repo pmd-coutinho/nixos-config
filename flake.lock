@@ -207,11 +207,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792662320,
-        "narHash": "sha256-0oqMSGqDQpIbKINQYXHZaEFFyt0RSX3dyysf6rDG7eE=",
+        "lastModified": 1792674922,
+        "narHash": "sha256-de1p3D8ghcVeOrkO97FRLZeNt2kim48A5YPcsw4Hhy8=",
         "owner": "pmd-coutinho",
         "repo": "msi-control",
-        "rev": "6024e79b5a781a85b9cef80da7e3439b91547fc2",
+        "rev": "38a4d5960465abd4df62e8c922fbc5f75512d297",
         "type": "github"
       },
       "original": {
