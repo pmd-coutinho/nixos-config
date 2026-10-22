@@ -102,6 +102,15 @@ in
     "application/xhtml+xml" = "helium.desktop";
     "x-scheme-handler/http" = "helium.desktop";
     "x-scheme-handler/https" = "helium.desktop";
+    # Without these, folders opened in VS Code (it claims inode/directory
+    # first) and images in Satty, the only app claiming them.
+    "inode/directory" = "org.gnome.Nautilus.desktop";
+    "application/pdf" = "org.gnome.Papers.desktop";
+    "image/png" = "org.gnome.Loupe.desktop";
+    "image/jpeg" = "org.gnome.Loupe.desktop";
+    "image/webp" = "org.gnome.Loupe.desktop";
+    "image/gif" = "org.gnome.Loupe.desktop";
+    "image/svg+xml" = "org.gnome.Loupe.desktop";
   };
 
   # Set your time zone.
@@ -198,7 +207,9 @@ in
     wget
     git
     firefox
-    blueman
+    loupe # image viewer
+    papers # PDF viewer
+    smartmontools # smartctl, for the drives smartd watches
     pwvucontrol
     vscode
     mcontrolcenter
@@ -261,6 +272,22 @@ in
   # Firmware updates (BIOS, EC, SSD) via LVFS: `fwupdmgr refresh && fwupdmgr update`.
   services.fwupd.enable = true;
 
+  # Desktop notifications when either NVMe drive's SMART health degrades.
+  # Keep notifications.wall at its default: the notify hook is only emitted
+  # when mail, wall or x11 is on, so turning wall off silences this too.
+  services.smartd = {
+    enable = true;
+    notifications.systembus-notify.enable = true;
+  };
+
+  # The module, not the bare package: it adds the blueman-mechanism unit that
+  # the applet's root helper is D-Bus-activated through.
+  services.blueman.enable = true;
+
+  # Media keys in hyprland.lua call playerctl; this installs it and runs
+  # playerctld, so they act on the most recently active player.
+  services.playerctld.enable = true;
+
   # Swap (zswap + a disk swapfile for large .NET builds) is in profiles/work.nix.
 
   # Transparent compression and no access-time writes on every btrfs mount.
@@ -321,6 +348,17 @@ in
     ];
     # Hard-link identical files in the store to save space.
     auto-optimise-store = true;
+    # The Noctalia team's CI caches. Noctalia and Umbriel follow our nixpkgs,
+    # but their builds still hit whenever the dependencies line up; otherwise
+    # they compile locally as before. cache.nixos.org is still asked first.
+    substituters = [
+      "https://noctalia.cachix.org"
+      "https://umbriel.cachix.org"
+    ];
+    trusted-public-keys = [
+      "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
+      "umbriel.cachix.org-1:JfNq/2yg2S6D6z4Z2dVSZrZlDPQTKtexB6GAVLD98nw="
+    ];
   };
 
   # `nh os switch` wraps nixos-rebuild with a package diff; `nh clean` prunes
