@@ -23,6 +23,7 @@ in
     ../noctalia.nix
     ./keepassxc-sync.nix
     ./msi-mux.nix
+    ./msi-control.nix
     ./acpi-dptf-fix.nix
     inputs.home-manager.nixosModules.home-manager
   ];

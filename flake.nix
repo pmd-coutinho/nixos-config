@@ -44,6 +44,11 @@
       url = "github:BeardOverflow/msi-ec";
       flake = false;
     };
+    # Run `nix flake update msi-control` to pick up new commits.
+    msi-control = {
+      url = "github:pmd-coutinho/msi-control";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     msi-mux = {
       url = "github:hayatboj/msi-gpu-mux-switch/v0.5.0";
       flake = false;
