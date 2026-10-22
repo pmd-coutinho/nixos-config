@@ -9,10 +9,10 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    claude-desktop = {
-      url = "github:poeck/claude-desktop-nix-flake";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # Claude Desktop, repackaged from Anthropic's apt index and prebuilt on
+    # cache.numtide.com. No `follows`: llm-agents is built against its own
+    # nixpkgs, so following ours would miss that cache and compile locally.
+    llm-agents.url = "github:numtide/llm-agents.nix";
     chatgpt-desktop = {
       url = "github:danielbodart/chatgpt-desktop";
       inputs.nixpkgs.follows = "nixpkgs";

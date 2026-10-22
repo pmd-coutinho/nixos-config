@@ -7,7 +7,7 @@
 }:
 
 let
-  claudeDesktop = inputs.claude-desktop.packages.${pkgs.stdenv.hostPlatform.system}.default;
+  claudeDesktop = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.claude-desktop;
 
   tuios = inputs.tuios.packages.${pkgs.stdenv.hostPlatform.system}.tuios;
 
@@ -58,6 +58,14 @@ in
   # clients: Kestrel, HttpClient, curl. Only the public cert is kept here; the
   # key stays in ~/.dotnet. Copy it again after a regenerate (expires 2027-09-25).
   security.pki.certificateFiles = [ ../certs/aspnet-dev.crt ];
+
+  # Numtide's cache for Claude Desktop (flake input llm-agents). It advertises
+  # priority 30, ahead of cache.nixos.org's 40; 50 keeps nixpkgs paths coming
+  # from cache.nixos.org.
+  nix.settings.substituters = [ "https://cache.numtide.com?priority=50" ];
+  nix.settings.trusted-public-keys = [
+    "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
+  ];
 
   boot.kernelPackages = pkgs.linuxPackages_zen;
   # Re-patch the NVIDIA tools (nvidia-smi, nvidia-powerd) in two patchelf calls: patchelf
