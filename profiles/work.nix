@@ -60,7 +60,21 @@ in
   security.pki.certificateFiles = [ ../certs/aspnet-dev.crt ];
 
   boot.kernelPackages = pkgs.linuxPackages_zen;
-  hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.latest;
+  # Re-patch the NVIDIA tools (nvidia-smi, nvidia-powerd) in two patchelf calls: patchelf
+  # 0.19.2 breaks the combined call and they segfault on start (NixOS/nixpkgs#576412,
+  # #576435). Only the userspace tools change; the kernel module is untouched.
+  # Drop the override once nixpkgs fixes this.
+  hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.latest.overrideAttrs (old: {
+    postFixup = (old.postFixup or "") + ''
+      for orig in $bin/origBin/*; do
+        f=$bin/bin/$(basename $orig)
+        rp=$(patchelf --print-rpath $f); int=$(patchelf --print-interpreter $f)
+        install -m755 $orig $f
+        patchelf --set-rpath "$rp" $f
+        patchelf --interpreter "$int" $f
+      done
+    '';
+  });
 
   # Rootful Docker daemon; access to its socket is limited to the work entry.
   virtualisation.docker = {

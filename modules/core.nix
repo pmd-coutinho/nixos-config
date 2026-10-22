@@ -138,6 +138,10 @@ in
     open = true;
     nvidiaSettings = true;
     powerManagement.enable = true;
+    # Runs nvidia-powerd, which the firmware supports (/proc/driver/nvidia/gpus/*/power).
+    # Together with the DPTF table fix (acpi-dptf-fix.nix) it lets the GPU go past 60 W.
+    # Needs the patchelf re-patch of the NVIDIA tools in profiles/work.nix to start.
+    dynamicBoost.enable = true;
   };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
