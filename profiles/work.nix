@@ -7,7 +7,14 @@
 }:
 
 let
-  claudeDesktop = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.claude-desktop;
+  llmAgents = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
+
+  # Without llm-agents' bubblewrap wrapper: in its user namespace root-owned
+  # files show as nobody, so ssh (and with it git push) and sudo fail for
+  # everything started from the app, Claude Code sessions included. nix-ld
+  # covers the generic-linux binaries the app downloads. Cowork's VM needs
+  # the wrapper's firmware paths, so it doesn't work this way.
+  claudeDesktop = llmAgents.claude-desktop.unwrapped;
 
   tuios = inputs.tuios.packages.${pkgs.stdenv.hostPlatform.system}.tuios;
 
@@ -147,7 +154,9 @@ in
     docker-buildx
     jetbrains.rider
     dotnet-sdk_10
-    claude-code
+    # From llm-agents: it tracks npm releases within a day or so, while
+    # nixos-unstable can sit on an older one for days.
+    llmAgents.claude-code
     claudeDesktop
     pi-coding-agent
     omp
