@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792568388,
-        "narHash": "sha256-BeFFUnsuLvJA6K1tgJGzjdPoMD4PQ1mNfp0EcVaw+ZM=",
+        "lastModified": 1792632819,
+        "narHash": "sha256-G8a1KYYi0wOID6iqMNPkYDgzg+qScmaoHvewRoPYLJs=",
         "owner": "danielbodart",
         "repo": "chatgpt-desktop",
-        "rev": "e1c0b2b0551769bf0338fb02d9d1a1cf7b312523",
+        "rev": "41abb7bad64e6549d48dd2a69ecccd5120f44415",
         "type": "github"
       },
       "original": {
@@ -167,11 +167,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792495086,
-        "narHash": "sha256-TyoYH983Nsc++1scw0SoOEKshPSJWJDxK7tTmuZ974M=",
+        "lastModified": 1792605213,
+        "narHash": "sha256-J73EBU30r2hXvHCcBtaigQDAIu/GGPYk1nc6P9THcmg=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "ec80131710bffcdf3b8498cf41f3a0579833b023",
+        "rev": "ab97a5d09e0f2aa7339cfd35ec5824fd6653e27c",
         "type": "github"
       },
       "original": {
@@ -197,6 +197,26 @@
       "original": {
         "owner": "BlueManCZ",
         "repo": "hyprmod",
+        "type": "github"
+      }
+    },
+    "msi-control": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1792662320,
+        "narHash": "sha256-0oqMSGqDQpIbKINQYXHZaEFFyt0RSX3dyysf6rDG7eE=",
+        "owner": "pmd-coutinho",
+        "repo": "msi-control",
+        "rev": "6024e79b5a781a85b9cef80da7e3439b91547fc2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "pmd-coutinho",
+        "repo": "msi-control",
         "type": "github"
       }
     },
@@ -317,11 +337,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792571353,
-        "narHash": "sha256-GsL/FqnR8wvb35V0H69N5Op5UFO0PDsoM9E2ekkpsvY=",
+        "lastModified": 1792653901,
+        "narHash": "sha256-78muVLcTK0P73ir65B88rr+MesTEemMrxywYQs9RVLk=",
         "owner": "noctalia-dev",
         "repo": "noctalia",
-        "rev": "8daaa253ac3ea793677f53b4d0be5dc1dd88f8e4",
+        "rev": "15051a8251435dfcb9abdb2c63b9cf401f2f0d58",
         "type": "github"
       },
       "original": {
@@ -337,6 +357,7 @@
         "helium": "helium",
         "home-manager": "home-manager",
         "hyprmod": "hyprmod",
+        "msi-control": "msi-control",
         "msi-ec": "msi-ec",
         "msi-mux": "msi-mux",
         "nixpkgs": "nixpkgs",
@@ -396,11 +417,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1792572141,
-        "narHash": "sha256-xH7LcARNGVVsGA9yJ8j3jZuWXFaaA7eU9knvNstULCY=",
+        "lastModified": 1792658745,
+        "narHash": "sha256-1D369cVmd9XnIbWMq7WNZkp05QadZlHZgIjKKpILBWA=",
         "owner": "Gaurav-Gosain",
         "repo": "tuios",
-        "rev": "83735293ef13d4313c02987b0d2b4ae4a721a927",
+        "rev": "585f677840d1206976c492594eae0c10b29482af",
         "type": "github"
       },
       "original": {
@@ -417,11 +438,11 @@
         "xdg-desktop-portal-umbriel": "xdg-desktop-portal-umbriel"
       },
       "locked": {
-        "lastModified": 1792574686,
-        "narHash": "sha256-rnrZrWko8VtFhIEErdEbA6V1gumspqbdIcD0FkGhvzE=",
+        "lastModified": 1792605344,
+        "narHash": "sha256-g5wojkRUCMRroU/Qr1SAjBRTvaChq3KB4OaZP4RdEaw=",
         "owner": "noctalia-dev",
         "repo": "umbriel",
-        "rev": "9c8b22ebd41a2a97c7b6d424bedbe60f6eaa89e5",
+        "rev": "8449975579a23d191f375a7d53cfe56e260ce19e",
         "type": "github"
       },
       "original": {
