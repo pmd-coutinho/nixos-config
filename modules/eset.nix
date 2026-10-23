@@ -1,4 +1,4 @@
-# ESET PROTECT for the work entry: ESET Management Agent + ESET Server Security.
+# ESET PROTECT (company endpoint security): ESET Management Agent + ESET Server Security.
 #
 # ESET doesn't support NixOS. Its Live Installer refuses anything that isn't
 # Ubuntu/Debian/RHEL/SUSE, and Server Security only installs through dpkg/rpm.

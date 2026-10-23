@@ -1,7 +1,7 @@
 # direnv cheatsheet
 
 direnv loads a project's environment when you `cd` into it and unloads it
-when you leave. It's enabled in every boot entry (see `home/shell.nix`), hooked
+when you leave. It's enabled in `home/shell.nix`, hooked
 into zsh, with nix-direnv caching the environment so re-entering is instant.
 
 ## Set up a project

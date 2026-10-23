@@ -54,8 +54,8 @@ in
   systemd.user.services.niri.serviceConfig.ManagedOOMPreference = "avoid";
 
   imports = [
-    ../modules/ai-tools.nix
-    ../modules/eset.nix
+    ./ai-tools.nix
+    ./eset.nix
   ];
 
   # `false` drops ESET from the build; `sudo eset off` stops it without one.
@@ -95,7 +95,7 @@ in
   # switch when the driver version changes; use `nh os boot` and reboot instead.
   system.switch.inhibitors.nvidia-driver = config.hardware.nvidia.package.version;
 
-  # Rootful Docker daemon; access to its socket is limited to the work entry.
+  # Rootful Docker daemon. Membership in the docker group is root-equivalent.
   virtualisation.docker = {
     enable = true;
     rootless.enable = false;

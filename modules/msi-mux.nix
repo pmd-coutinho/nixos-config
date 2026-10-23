@@ -5,7 +5,7 @@
 { inputs, pkgs, ... }:
 
 let
-  # Refresh after a BIOS update (fwupd), or switching is disabled again.
+  # Refresh after a BIOS update (MSI M-Flash), or switching is disabled again.
   model = "Vector 16 HX A14VHG";
   board = "MS-15M1";
   bios = "E15M1IMS.915";

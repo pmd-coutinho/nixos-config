@@ -1,5 +1,6 @@
-# Hardware, boot and desktop settings that don't belong to a profile. The
-# kernel and NVIDIA driver are picked in profiles/work.nix.
+# Hardware, boot and desktop settings shared by everything on this laptop.
+# Work tooling (kernel, NVIDIA package, Docker, VPN, ESET, .NET) is in
+# modules/work.nix.
 
 {
   config,
@@ -143,7 +144,7 @@
     powerManagement.enable = true;
     # Runs nvidia-powerd, which the firmware supports (/proc/driver/nvidia/gpus/*/power).
     # Together with the DPTF table fix (acpi-dptf-fix.nix) it lets the GPU go past 60 W.
-    # Needs the patchelf re-patch of the NVIDIA tools in profiles/work.nix to start.
+    # Needs the patchelf re-patch of the NVIDIA tools in modules/work.nix to start.
     dynamicBoost.enable = true;
   };
 
@@ -243,6 +244,7 @@
   # `sudo ras-mc-ctl --summary` / `--errors`. Across boots, the journal has
   # them too: `journalctl _TRANSPORT=kernel -g 'Machine Check'`.
   hardware.rasdaemon.enable = true;
+
   systemd.tmpfiles.rules = [
     # Hyprland runs through a cap_sys_nice wrapper, so glibc strips TZDIR
     # from everything it launches. .NET then looks in /usr/share/zoneinfo,
@@ -251,7 +253,9 @@
     "L+ /usr/share/zoneinfo - - - - /etc/zoneinfo"
   ];
 
-  # Firmware updates (BIOS, EC, SSD) via LVFS: `fwupdmgr refresh && fwupdmgr update`.
+  # LVFS has firmware here only for the UEFI dbx/db/KEK and the Logitech
+  # receiver (`fwupdmgr refresh && fwupdmgr update`). BIOS and EC updates come
+  # from MSI (M-Flash), SSD firmware from MSI or Samsung.
   services.fwupd.enable = true;
 
   # Desktop notifications when either NVMe drive's SMART health degrades.
@@ -270,7 +274,7 @@
   # playerctld, so they act on the most recently active player.
   services.playerctld.enable = true;
 
-  # Swap (zswap + a disk swapfile for large .NET builds) is in profiles/work.nix.
+  # Swap (zswap + a disk swapfile for large .NET builds) is in modules/work.nix.
 
   # Transparent compression and no access-time writes on every btrfs mount.
   # These merge with the options in hardware-configuration.nix.

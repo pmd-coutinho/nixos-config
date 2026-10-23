@@ -3,7 +3,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     # Only for azure-cli while its fabric dependency is broken by invoke 3
-    # (see profiles/work.nix). The last nixos-unstable with invoke 2.2.1.
+    # (see modules/work.nix). The last nixos-unstable with invoke 2.2.1.
     nixpkgs-azure-cli.url = "github:NixOS/nixpkgs/fe13242281a67641c0102cdb1087f0ebe586c7df";
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -52,18 +52,12 @@
   };
   outputs =
     inputs@{ nixpkgs, ... }:
-    let
-      system = "x86_64-linux";
-      mkSystem = nixpkgs.lib.nixosSystem {
-        inherit system;
+    {
+      # hardware-configuration.nix sets nixpkgs.hostPlatform.
+      nixosConfigurations.pedrocoutinho-nixos = nixpkgs.lib.nixosSystem {
         specialArgs = { inherit inputs; };
         modules = [ ./configuration.nix ];
       };
-    in
-    {
-      nixosConfigurations = {
-        "pedrocoutinho-nixos" = mkSystem;
-      };
-      formatter.${system} = nixpkgs.legacyPackages.${system}.nixfmt-tree;
+      formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt-tree;
     };
 }
