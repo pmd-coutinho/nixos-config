@@ -29,11 +29,11 @@
       url = "github:noctalia-dev/noctalia";
       inputs.nixpkgs.follows = "nixpkgs"; # this line is optional, prevents downloading two versions of nixpkgs but disables cache
     };
-    umbriel = {
-      url = "github:noctalia-dev/umbriel";
-      # Build against our nixpkgs so Umbriel's wlroots and mesa match the
-      # system graphics stack. That gives up umbriel.cachix.org: Umbriel
-      # compiles locally (a few minutes) whenever the two nixpkgs pins differ.
+    # biri, a niri fork with extra features. It has no binary cache, so it
+    # compiles locally either way; following our nixpkgs keeps its mesa in
+    # step with the system graphics stack.
+    biri = {
+      url = "github:barrulus/biri";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     hyprmod = {

@@ -31,7 +31,7 @@ in
 
   programs.ghostty = {
     enable = true;
-    # The compositor (Hyprland or Umbriel) launches Ghostty directly, not as a
+    # The compositor (Hyprland or niri) launches Ghostty directly, not as a
     # systemd service.
     systemd.enable = false;
     settings = {

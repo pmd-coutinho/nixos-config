@@ -51,7 +51,7 @@ in
   # oomd kills whole cgroups, and the compositor's unit is the biggest leaf in
   # session.slice. Make it the last pick, so a runaway app goes first.
   systemd.user.services."wayland-wm@".serviceConfig.ManagedOOMPreference = "avoid";
-  systemd.user.services.umbriel.serviceConfig.ManagedOOMPreference = "avoid";
+  systemd.user.services.niri.serviceConfig.ManagedOOMPreference = "avoid";
 
   imports = [
     ../modules/ai-tools.nix

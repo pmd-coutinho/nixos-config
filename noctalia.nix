@@ -3,7 +3,6 @@
 {
   imports = [
     inputs.noctalia.nixosModules.default
-    inputs.umbriel.nixosModules.default
   ];
 
   environment.systemPackages = with pkgs; [
@@ -16,6 +15,7 @@
     unar # File Roller's backend for RAR, including encrypted headers
     adw-gtk3
     nwg-look
+    xwayland-satellite # niri starts it on demand for X11 apps
 
     # Noctalia Screen Toolkit requirements.
     slurp
@@ -51,10 +51,14 @@
     enable = true;
     withUWSM = true;
   };
-  # A second greeter session beside Hyprland, with its screencast and
-  # screenshot portal. start-umbriel runs it as a systemd user service, so it
-  # needs no UWSM. Its config is Home Manager's (home/umbriel.nix).
-  programs.umbriel.enable = true;
+  # biri, a niri fork, as a second greeter session beside Hyprland. Its config
+  # is Home Manager's (home/niri.nix).
+  programs.niri = {
+    enable = true;
+    package = inputs.biri.packages.${pkgs.stdenv.hostPlatform.system}.niri;
+  };
+  # The niri module would make it the greeter's default session.
+  services.displayManager.defaultSession = null;
 
   # Use Noctalia's generated palette for Qt 5 and Qt 6 apps (see home/desktop.nix).
   # The NixOS qt5ct platform theme installs both qt5ct and qt6ct plugins.

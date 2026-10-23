@@ -348,16 +348,14 @@ in
     ];
     # Hard-link identical files in the store to save space.
     auto-optimise-store = true;
-    # The Noctalia team's CI caches. Noctalia and Umbriel follow our nixpkgs,
-    # but their builds still hit whenever the dependencies line up; otherwise
-    # they compile locally as before. cache.nixos.org is still asked first.
+    # The Noctalia team's CI cache. Noctalia follows our nixpkgs, but its
+    # builds still hit whenever the dependencies line up; otherwise it
+    # compiles locally as before. cache.nixos.org is still asked first.
     substituters = [
       "https://noctalia.cachix.org"
-      "https://umbriel.cachix.org"
     ];
     trusted-public-keys = [
       "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
-      "umbriel.cachix.org-1:JfNq/2yg2S6D6z4Z2dVSZrZlDPQTKtexB6GAVLD98nw="
     ];
   };
 
