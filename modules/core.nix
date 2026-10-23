@@ -250,24 +250,13 @@ in
   # `sudo ras-mc-ctl --summary` / `--errors`. Across boots, the journal has
   # them too: `journalctl _TRANSPORT=kernel -g 'Machine Check'`.
   hardware.rasdaemon.enable = true;
-  # Experiment from 2026-10-19 for two weeks: hold those cores at the 5.6 GHz
-  # the other P-cores top out at, to see whether the errors come from the
-  # 5.8 GHz boost step. Check it holds with
-  # `cat /sys/devices/system/cpu/cpu{8..11}/cpufreq/scaling_max_freq`.
-  systemd.tmpfiles.rules =
-    map (cpu: "w /sys/devices/system/cpu/cpu${toString cpu}/cpufreq/scaling_max_freq - - - - 5600000") [
-      8
-      9
-      10
-      11
-    ]
-    ++ [
-      # Hyprland runs through a cap_sys_nice wrapper, so glibc strips TZDIR
-      # from everything it launches. .NET then looks in /usr/share/zoneinfo,
-      # which NixOS lacks, and every TimeZoneInfo lookup throws.
-      "d /usr/share 0755 root root -"
-      "L+ /usr/share/zoneinfo - - - - /etc/zoneinfo"
-    ];
+  systemd.tmpfiles.rules = [
+    # Hyprland runs through a cap_sys_nice wrapper, so glibc strips TZDIR
+    # from everything it launches. .NET then looks in /usr/share/zoneinfo,
+    # which NixOS lacks, and every TimeZoneInfo lookup throws.
+    "d /usr/share 0755 root root -"
+    "L+ /usr/share/zoneinfo - - - - /etc/zoneinfo"
+  ];
 
   # Firmware updates (BIOS, EC, SSD) via LVFS: `fwupdmgr refresh && fwupdmgr update`.
   services.fwupd.enable = true;
