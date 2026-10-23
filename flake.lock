@@ -297,22 +297,6 @@
         "type": "github"
       }
     },
-    "msi-ec": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1786311270,
-        "narHash": "sha256-+XNrhKeltD5eaasqDOdQ/9/dcPf1H6z2N8hGB344POQ=",
-        "owner": "BeardOverflow",
-        "repo": "msi-ec",
-        "rev": "d7fbbd88e6831e56801b860e46475cbf8ddbc7c1",
-        "type": "github"
-      },
-      "original": {
-        "owner": "BeardOverflow",
-        "repo": "msi-ec",
-        "type": "github"
-      }
-    },
     "msi-mux": {
       "flake": false,
       "locked": {
@@ -452,7 +436,6 @@
         "hyprmod": "hyprmod",
         "llm-agents": "llm-agents",
         "msi-control": "msi-control",
-        "msi-ec": "msi-ec",
         "msi-mux": "msi-mux",
         "nixpkgs": "nixpkgs_2",
         "nixpkgs-azure-cli": "nixpkgs-azure-cli",

@@ -8,14 +8,6 @@
   ...
 }:
 
-let
-  msi-ec = config.boot.kernelPackages.msi-ec.overrideAttrs (_: {
-    # Nixpkgs 0.12 lacks support for the Vector 16 HX A14V EC firmware .112.
-    version = "0.13-git-d7fbbd8";
-    src = inputs.msi-ec;
-    patches = [ ../patches/msi-ec-nix-build.patch ];
-  });
-in
 {
   imports = [
     # Include the results of the hardware scan.
@@ -49,7 +41,8 @@ in
   # Not tmpfs: those dirs reach tens of GB.
   boot.tmp.cleanOnBoot = true;
 
-  boot.extraModulePackages = [ msi-ec ];
+  # nixpkgs' msi-ec supports this EC firmware (15M1IMS2.112).
+  boot.extraModulePackages = [ config.boot.kernelPackages.msi-ec ];
   boot.kernelModules = [
     "msi-ec"
     "ec_sys"

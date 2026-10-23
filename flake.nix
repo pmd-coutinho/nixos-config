@@ -40,10 +40,6 @@
       url = "github:BlueManCZ/hyprmod";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    msi-ec = {
-      url = "github:BeardOverflow/msi-ec";
-      flake = false;
-    };
     # Run `nix flake update msi-control` to pick up new commits.
     msi-control = {
       url = "github:pmd-coutinho/msi-control";
